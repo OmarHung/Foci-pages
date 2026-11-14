@@ -4,305 +4,1547 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Foci — 在對的圈子，遇見對的人</title>
-  <meta name="description" content="Foci 是以「圈子」為核心的交友 App。先加入交友圈，再開始配對——在共同興趣與真實生活圈裡，遇見頻率相同的人。" />
+  <meta name="description" content="Foci 是以交友圈為核心的交友 App：先加入登山、咖啡、同行業或你住的那一區，在圈子裡滑卡，配對時會標出你們的共同圈。" />
 
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Foci — 在對的圈子，遇見對的人" />
-  <meta property="og:description" content="以「圈子」為核心的交友 App。先加入交友圈，再開始配對，在懂你的圈子裡自然相遇。" />
+  <meta property="og:description" content="先加入交友圈，再開始配對。登山、咖啡、同行業、你住的那一區，配對時會標出你們的共同圈。" />
   <meta property="og:url" content="https://www.foci-app.com/" />
   <meta property="og:image" content="https://www.foci-app.com/assets/screens/iphone-6.5-1.jpg" />
-  <meta name="theme-color" content="#DC5E4E" />
+  <meta name="theme-color" content="#FAFAF9" />
+  <link rel="icon" type="image/png" href="assets/icon-180.png" />
+  <link rel="apple-touch-icon" href="assets/icon-180.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700&display=swap" rel="stylesheet" />
 
   <style>
+    /* ── Tokens：顏色與字體沿用 App（apps/mobile/src/theme.ts） ── */
+    /* 底色刻意用中性灰白：米色底配珊瑚色正是「AI 助理品牌」的配色，會讓頁面像 AI 做的 */
     :root {
-      --ink: #2b2b2b; --ink2: #5a5a5a; --accent: #DC5E4E; --accent-d: #c44d3e;
-      --line: #ececec; --bg: #fafafa; --soft: #fff6f4; --soft-line: #f3d5cf;
+      --bg: #FAFAF9;
+      --surface: #F2F1EF;
+      --surface-2: #E9E8E5;
+      --ink: #2A2422;
+      --muted: #6F655F;
+      --accent: #DC5E4E;          /* 品牌珊瑚：喜歡按鈕 */
+      --accent-strong: #BE4636;   /* 按鈕底與連結，白字對比 5:1 */
+      --accent-press: #A63B2D;
+      --accent-soft: #F8EAE4;
+      --gold: #B0894A;            /* 只給「共同圈」 */
+      --gold-ink: #75572A;        /* 比 App 的 goldDark 深一階，淺金底上對比 ≥ 4.5 */
+      --gold-soft: #F4ECDC;
+
+      --serif: "Noto Serif TC", "Songti TC", "Noto Serif CJK TC", serif;
+      --sans: -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+
+      --step-display: clamp(40px, 5vw, 76px);
+      --step-heading: clamp(28px, 2.8vw, 40px);
+      --step-lead: clamp(18px, 1.4vw, 20px);
+      --step-body: 16px;
+      --step-small: 14px;
+
+      --margin: clamp(20px, 3.4vw, 48px);
+      --gap: clamp(16px, 1.7vw, 24px);
+      --section: clamp(96px, 11vw, 168px);
+      --tile: 24px;
+      --ease: cubic-bezier(.22, .7, .3, 1);
     }
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
     body {
       margin: 0; background: var(--bg); color: var(--ink);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
-      line-height: 1.75; font-size: 16px; -webkit-font-smoothing: antialiased;
+      font-family: var(--sans); font-size: var(--step-body); line-height: 1.6;
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
     }
-    a { color: var(--accent); text-decoration: none; }
-    .wrap { max-width: 1040px; margin: 0 auto; padding: 0 22px; }
+    img { display: block; max-width: 100%; height: auto; }
+    a { color: inherit; }
+    button { font: inherit; color: inherit; cursor: pointer; }
+    h1, h2, h3 { font-family: var(--serif); font-weight: 700; margin: 0; letter-spacing: -0.02em; }
+    p { margin: 0; }
+    :focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+    .skip { position: absolute; left: var(--margin); top: -60px; background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 999px; z-index: 30; }
+    .skip:focus { top: 12px; }
 
-    /* Nav */
-    nav {
-      position: sticky; top: 0; z-index: 20;
-      background: rgba(250,250,250,0.85); backdrop-filter: saturate(180%) blur(12px);
-      border-bottom: 1px solid var(--line);
+    .grid {
+      display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap);
+      padding-inline: var(--margin); max-width: 1680px; margin-inline: auto;
     }
-    .nav-in { display: flex; align-items: center; justify-content: space-between; height: 64px; }
-    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 20px; color: var(--ink); letter-spacing: 0.5px; }
-    .logo {
-      width: 34px; height: 34px; border-radius: 10px;
-      background: linear-gradient(135deg, var(--accent), #f0876f);
-      display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 18px;
-      box-shadow: 0 4px 14px rgba(220,94,78,0.35);
-    }
-    .nav-links { display: flex; align-items: center; gap: 26px; }
-    .nav-links a { color: var(--ink2); font-size: 15px; }
-    .nav-links a:hover { color: var(--accent); }
+
+    /* ── Buttons & links ── */
     .btn {
-      display: inline-block; background: var(--accent); color: #fff; font-weight: 600;
-      padding: 10px 20px; border-radius: 999px; font-size: 15px;
-      box-shadow: 0 6px 18px rgba(220,94,78,0.32); transition: transform .15s ease, background .15s ease;
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      min-height: 52px; padding: 0 28px; border-radius: 999px; border: 0;
+      background: var(--accent-strong); color: #fff; font-weight: 600; font-size: var(--step-body);
+      text-decoration: none; white-space: nowrap;
+      transition: background-color .2s var(--ease), transform .2s var(--ease);
     }
-    .btn:hover { background: var(--accent-d); transform: translateY(-1px); }
-    .btn.ghost { background: #fff; color: var(--accent); border: 1px solid var(--soft-line); box-shadow: none; }
-
-    /* Hero */
-    .hero { padding: 72px 0 60px; }
-    .hero-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 48px; align-items: center; }
-    .tag {
-      display: inline-block; background: var(--soft); color: var(--accent-d);
-      border: 1px solid var(--soft-line); border-radius: 999px;
-      font-size: 13.5px; padding: 5px 14px; margin-bottom: 20px; letter-spacing: 0.3px;
+    .btn:hover { background: var(--accent-press); }
+    .btn:active { transform: scale(.97); }
+    .btn svg { width: 18px; height: 18px; flex: none; }
+    .btn-sm { min-height: 44px; padding: 0 20px; }
+    /* App 還沒上架：按鈕先改成不能點的狀態，上架後換回連結 */
+    .btn-soon, .btn-soon:hover { background: var(--surface-2); color: var(--ink); cursor: default; }
+    .btn-soon:active { transform: none; }
+    .text-link {
+      font-weight: 600; text-decoration: underline; text-underline-offset: 6px;
+      text-decoration-thickness: 2px; text-decoration-color: var(--accent);
+      transition: text-decoration-color .2s var(--ease), color .2s var(--ease);
     }
-    h1 { font-size: 48px; line-height: 1.2; margin: 0 0 18px; letter-spacing: 0.5px; }
-    h1 .hl { color: var(--accent); }
-    .lead { font-size: 18px; color: var(--ink2); margin: 0 0 30px; max-width: 480px; }
-    .cta-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
-    .store-hint { font-size: 13px; color: #999; margin-top: 14px; }
+    .text-link:hover { color: var(--accent-strong); text-decoration-color: var(--accent-strong); }
 
-    /* Hero shot (real screenshot) */
-    .hero-shot { display: grid; place-items: center; }
-    .hero-shot img {
-      width: 100%; max-width: 340px; height: auto; border-radius: 30px;
-      box-shadow: 0 30px 70px rgba(220,94,78,0.28), 0 10px 30px rgba(0,0,0,0.12);
+    /* ── Top bar ── */
+    .bar {
+      display: flex; align-items: center; justify-content: space-between; gap: 24px;
+      height: 80px; padding-inline: var(--margin); max-width: 1680px; margin-inline: auto;
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+    .brand svg { width: 44px; height: 28px; overflow: visible; }
+    .brand span { font-family: var(--serif); font-weight: 700; font-size: var(--step-lead); letter-spacing: -0.01em; }
+    .nav { display: flex; align-items: center; gap: clamp(16px, 2.2vw, 32px); }
+    .nav a:not(.btn) { text-decoration: none; font-size: var(--step-body); transition: color .2s var(--ease); }
+    .nav a:not(.btn):hover { color: var(--accent-strong); }
+
+    /* ── Hero ── */
+    .hero { padding-block: clamp(8px, 2vw, 24px) clamp(64px, 7vw, 112px); }
+    .hero .grid { align-items: stretch; grid-template-rows: 1fr auto; }
+    .hero-copy { grid-column: 1 / 7; grid-row: 1; display: flex; flex-direction: column; justify-content: flex-end; padding-top: 24px; padding-right: clamp(0px, 3vw, 48px); }
+    .hero-picker { grid-column: 1 / 7; grid-row: 2; padding-bottom: 24px; padding-right: clamp(0px, 3vw, 48px); }
+    .hero h1 { font-size: var(--step-display); line-height: 1.08; }
+    .hero h1 span { display: block; }
+    .lead { font-size: var(--step-lead); line-height: 1.65; margin-top: 32px; max-width: 29em; }
+    .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 28px; margin-top: 36px; }
+
+    /* 圈子選擇器（App 介面片段） */
+    .picker { margin-top: 56px; max-width: 560px; }
+    .picker-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+    .picker-head p:first-child { font-size: 16px; font-weight: 600; }
+    .picker-count { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 16px;
+      border-radius: 999px; background: #fff; border: 1px solid rgba(42,36,34,.14);
+      font-size: 15px; transition: background-color .2s var(--ease), border-color .2s var(--ease), color .2s var(--ease), transform .15s var(--ease);
+    }
+    .chip:hover { border-color: rgba(42,36,34,.36); }
+    .chip:active { transform: scale(.96); }
+    .chip svg { width: 14px; height: 14px; display: none; }
+    .chip[aria-pressed="true"] { background: var(--accent-soft); border-color: rgba(190,70,54,.45); color: var(--accent-press); font-weight: 600; }
+    .chip[aria-pressed="true"] svg { display: block; }
+    .picker-result { margin-top: 18px; font-size: var(--step-body); }
+    .picker-result b { font-weight: 600; }
+    .picker-note { min-height: 22px; margin-top: 6px; font-size: 14px; color: var(--accent-strong); }
+
+    /* 首屏右側：App 探索頁的卡片堆，直接放在頁面上 */
+    .hero-stage {
+      grid-column: 7 / 13; grid-row: 1 / 3; position: relative;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
+      padding: 24px 0;
+    }
+    .deck { --back: translateX(28px) rotate(5deg) scale(.95); position: relative; width: min(372px, 100%); aspect-ratio: 340 / 466; }
+    .pcard {
+      position: absolute; inset: 0; border-radius: 26px; overflow: hidden; background: #2A2422; color: #fff;
+      opacity: 0; visibility: hidden; pointer-events: none; transform: var(--back); transform-origin: 50% 100%;
+      box-shadow: 0 18px 40px rgba(42,36,34,.16); /* taste-skill-ignore：App 卡片本身的陰影 */
+      transition: opacity .6s var(--ease), transform .6s var(--ease), visibility 0s linear .6s;
+    }
+    .pcard.is-on { z-index: 2; opacity: 1; visibility: visible; pointer-events: auto; transform: none; transition: opacity .6s var(--ease), transform .6s var(--ease), visibility 0s; }
+    .pcard.is-next { z-index: 1; opacity: 1; visibility: visible; transition: opacity .6s var(--ease), transform .6s var(--ease), visibility 0s; }
+    .pcard.is-next .pcard-info { visibility: hidden; }
+    .pcard.is-next img { filter: brightness(.8); }
+    .pcard.is-out { z-index: 3; transform: translateX(-56px) rotate(-7deg); }
+    .pcard img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1); transition: transform 7s linear; }
+    .pcard.is-on img { transform: scale(1.06); }
+    .pcard-info {
+      position: absolute; left: 0; right: 0; bottom: 0; padding: 72px 18px 18px;
+      background: linear-gradient(to top, rgba(20,14,12,.86) 0%, rgba(20,14,12,.55) 55%, rgba(20,14,12,0) 100%); /* taste-skill-ignore：照片上文字的中性遮罩 */
+    }
+    .pcard-name { font-family: var(--serif); font-weight: 700; font-size: 30px; line-height: 1.1; }
+    .pcard-name span { font-weight: 600; font-size: 24px; margin-left: 6px; }
+    .pcard-meta { margin-top: 8px; font-size: 14px; color: rgba(255,255,255,.86); }
+    .pcard-bio { margin-top: 8px; font-size: 14px; line-height: 1.5; color: rgba(255,255,255,.92); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .pcard-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .pcard-tags span { display: inline-flex; align-items: center; min-height: 28px; padding: 0 11px; border-radius: 999px; font-size: 13px; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.28); }
+    .pcard-tags .shared { background: var(--gold-soft); border-color: var(--gold-soft); color: var(--gold-ink); font-weight: 600; }
+    .pcard-empty { display: grid; place-items: center; text-align: center; padding: 32px; background: #fff; color: var(--ink); }
+    .pcard-empty p { font-family: var(--serif); font-weight: 700; font-size: 22px; line-height: 1.4; }
+
+    /* 探索頁的略過／喜歡按鈕 */
+    .deck-actions { display: flex; align-items: center; gap: 22px; }
+    .act { display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; transition: transform .15s var(--ease), background-color .2s var(--ease); }
+    .act svg { width: 26px; height: 26px; }
+    .act-pass { width: 58px; height: 58px; background: #fff; color: var(--ink); border: 1px solid rgba(42,36,34,.14); }
+    .act-like { width: 70px; height: 70px; background: var(--accent); color: #fff; }
+    .act-like svg { width: 30px; height: 30px; }
+    .act:hover { transform: translateY(-2px); }
+    .act-like:hover { background: var(--accent-strong); }
+    .act:active { transform: scale(.92); }
+    .act-like.pop, .sa.like.pop { animation: pop .4s var(--ease); }
+    @keyframes pop { 40% { transform: scale(1.14); } }
+
+    /* ── 交友圈清單 ── */
+    /* 交友圈清單：滿版淺灰色帶，和上下段落分開 */
+    .circles { background: var(--surface); padding-block: clamp(72px, 8vw, 128px); margin-bottom: var(--section); }
+    .circles-head { grid-column: 1 / 5; align-self: start; position: sticky; top: 32px; }
+    .circles-head h2 { font-size: var(--step-heading); line-height: 1.2; }
+    .circles-head > p { margin-top: 24px; font-size: var(--step-lead); line-height: 1.65; }
+    .circles-head .text-link { display: inline-block; margin-top: 24px; font-size: var(--step-body); }
+    .circle-col { grid-column: span 4; }
+    .circle-col:first-of-type { grid-column: 5 / 9; }
+    .circle-col h3 { font-size: var(--step-lead); line-height: 1.3; margin: 0 0 12px; }
+    .circle-col h3:not(:first-child) { margin-top: 48px; }
+    .circle-col h3 small { font-family: var(--sans); font-weight: 400; font-size: var(--step-small); color: var(--muted); margin-left: 8px; }
+    .rows { list-style: none; margin: 0; padding: 0; }
+    .rows li { display: flex; align-items: center; gap: 10px; min-height: 40px; }
+    .rows .ring { width: 14px; height: 14px; flex: none; border-radius: 50%; border: 2.5px solid var(--accent); }
+    .rows .ring.region { border-color: var(--muted); }
+    .rows .ring.gate { border-color: var(--gold); }
+    .rows .name { font-size: var(--step-body); }
+    .rows .val { margin-left: auto; padding-left: 12px; font-size: var(--step-small); color: var(--muted); text-align: right; }
+
+    /* ── 畫面索引（showcase） ── */
+    .show { padding-block: 0 var(--section); }
+    .show-index { grid-column: 1 / 6; display: flex; flex-direction: column; }
+    .show-index h2 { font-size: var(--step-heading); line-height: 1.2; }
+    .show-names { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; margin-top: 48px; }
+    .show-names button {
+      display: inline-flex; align-items: center; gap: 14px;
+      background: none; border: 0; padding: 4px 0; text-align: left;
+      font-family: var(--serif); font-weight: 700; font-size: var(--step-heading); line-height: 1.2; letter-spacing: -0.02em;
+      color: var(--muted); transition: color .2s var(--ease), transform .2s var(--ease);
+    }
+    .show-names button:hover { color: var(--ink); transform: translateX(4px); }
+    .show-names button[aria-selected="true"] { color: var(--ink); }
+    /* 分頁前的小圈：選中的那個會慢慢畫滿，滿了就換下一頁 */
+    .tab-ring { width: 22px; height: 22px; flex: none; }
+    .tab-ring circle { fill: none; stroke-width: 2.6; }
+    .tab-ring .track { stroke: rgba(42,36,34,.2); transition: stroke .2s var(--ease); }
+    .tab-ring .fill { stroke: var(--accent); stroke-dasharray: 100; stroke-dashoffset: 100; stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; }
+    .show-names button:hover .track { stroke: var(--ink); }
+    .show-names button[aria-selected="true"] .track { stroke: rgba(220,94,78,.25); }
+    .show-names button[aria-selected="true"] .fill { stroke-dashoffset: 0; }
+    .show-names.is-playing button[aria-selected="true"] .fill { animation: ring-fill 6s linear forwards; }
+    .show-names.is-playing.is-paused button[aria-selected="true"] .fill { animation-play-state: paused; }
+    @keyframes ring-fill { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+    .show-texts { margin-top: 40px; max-width: 26em; min-height: 8em; position: relative; }
+    .show-texts p { font-size: var(--step-lead); line-height: 1.65; }
+    .js .show-texts p { position: absolute; inset: 0 0 auto 0; opacity: 0; transition: opacity .3s var(--ease); }
+    .js .show-texts p.is-on { opacity: 1; position: relative; }
+    .js .show-texts p:not(.is-on) { visibility: hidden; }
+    .show .grid { align-items: center; }
+    /* App 元件：像首屏一樣，只放卡片本身，不畫整支手機 */
+    .show-stage { grid-column: 6 / 13; display: grid; align-items: center; justify-items: center; }
+    .shot {
+      grid-area: 1 / 1; width: 100%; margin: 0; display: flex; flex-direction: column; align-items: center;
+      font-family: var(--sans); color: var(--ink);
+      opacity: 0; visibility: hidden; transform: translateY(10px);
+      transition: opacity .35s var(--ease), transform .35s var(--ease), visibility 0s linear .35s;
+    }
+    .shot.is-on { opacity: 1; visibility: visible; transform: none; transition: opacity .35s var(--ease), transform .35s var(--ease), visibility 0s; }
+    .shot i { font-style: normal; }
+    .ui-card { box-shadow: 0 14px 32px rgba(42,36,34,.12); } /* taste-skill-ignore：App 卡片本身的陰影 */
+    .ico { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+    /* 交友圈卡片 */
+    .cgrid { width: 100%; max-width: 680px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .circ { display: flex; flex-direction: column; background: #fff; border-radius: 18px; overflow: hidden; }
+    .s-cover { position: relative; height: 76px; display: flex; align-items: flex-end; padding: 10px 12px; background: var(--c); color: #fff; }
+    .s-cover b { position: relative; font-family: var(--serif); font-size: 20px; line-height: 1.2; }
+    .circ p { padding: 10px 12px 0; font-size: 13px; line-height: 1.55; color: var(--muted); }
+    .circ-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px 12px; font-size: 13px; }
+    .circ-foot span { color: var(--muted); }
+    .circ-foot em { display: inline-flex; align-items: center; gap: 3px; font-style: normal; font-weight: 600; color: #3B7D5E; white-space: nowrap; }
+    .circ-foot em.gate { color: var(--accent-strong); }
+
+    /* 探索：檔案卡＋按鈕 */
+    .s-card { position: relative; width: min(330px, 100%); aspect-ratio: 330 / 452; border-radius: 22px; overflow: hidden; background: #2A2422; color: #fff; }
+    .s-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .s-card .pcard-info { padding: 64px 14px 14px; }
+    .s-card .pcard-name { font-size: 26px; }
+    .s-card .pcard-name span { font-size: 20px; }
+    .s-deck { position: relative; width: min(330px, 100%); aspect-ratio: 330 / 452; }
+    .s-deck .s-card { position: absolute; inset: 0; width: 100%; aspect-ratio: auto; transition: transform .3s var(--ease), filter .3s var(--ease); }
+    .s-deck .s-card.is-under { transform: translateY(12px) scale(.95); filter: brightness(.82); }
+    .s-deck .s-card.is-under .pcard-info { visibility: hidden; }
+    .s-actions { display: flex; align-items: center; justify-content: center; gap: 12px; padding-top: 22px; }
+    .s-actions .sa { position: relative; width: 46px; height: 46px; padding: 0; border-radius: 50%; display: grid; place-items: center; background: #fff; border: 1px solid rgba(42,36,34,.12); color: var(--ink); transition: transform .15s var(--ease), opacity .2s var(--ease); }
+    .s-actions button.sa:hover { transform: translateY(-2px); }
+    .s-actions button.sa:active { transform: scale(.92); }
+    .s-actions button.sa:disabled { opacity: .4; cursor: default; transform: none; }
+    .s-actions .sa.sm { width: 38px; height: 38px; color: var(--muted); }
+    .s-actions .sa.like { width: 56px; height: 56px; border: 0; background: var(--accent); color: #fff; }
+    .s-actions .sa.like .ico { width: 24px; height: 24px; fill: currentColor; stroke: none; }
+    .s-actions .sa.star { color: var(--gold); }
+    .s-actions .sa.star .ico { fill: currentColor; stroke: none; }
+    .s-actions .sa.star b { position: absolute; top: -6px; right: -8px; padding: 0 6px; height: 18px; border-radius: 9px; display: grid; place-items: center; background: var(--gold); color: #fff; font-size: 13px; font-weight: 600; line-height: 1; }
+
+    /* 滑卡：左滑略過、右滑喜歡、上滑超級喜歡（首屏與探索共用） */
+    .swipe { touch-action: none; user-select: none; -webkit-user-select: none; border-radius: 24px; }
+    .swipe:focus-visible { outline-offset: 8px; }
+    .swipe img { -webkit-user-drag: none; }
+    .swipe .is-top, .deck .pcard.is-on { cursor: grab; }
+    .swipe .dragging { cursor: grabbing; transition: none !important; }
+    .stamp {
+      position: absolute; z-index: 3; top: 22px; padding: 2px 12px; border: 3px solid currentColor; border-radius: 10px;
+      font-family: var(--sans); font-weight: 800; font-size: 22px; line-height: 1.3; letter-spacing: .02em;
+      opacity: 0; visibility: hidden; pointer-events: none;
+    }
+    .stamp.like { left: 18px; color: #5FD3A0; transform: rotate(-14deg); }
+    .stamp.nope { right: 18px; color: #fff; transform: rotate(14deg); }
+    .stamp.super { left: 50%; top: 38%; color: #F2C66D; transform: translateX(-50%) rotate(-6deg); }
+
+    /* 完整檔案卡 */
+    .s-profile { width: min(330px, 100%); background: #fff; border-radius: 26px; overflow: hidden; }
+    .s-photo { position: relative; height: 250px; }
+    .s-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center 22%; }
+    .s-photo i { position: absolute; right: 12px; top: 12px; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: rgba(20,14,12,.4); color: #fff; }
+    .s-body { padding: 16px 18px 20px; }
+    .s-pname { font-family: var(--serif); font-weight: 700; font-size: 28px; line-height: 1.15; }
+    .s-pname span { font-weight: 600; font-size: 22px; color: var(--muted); margin-left: 6px; }
+    .s-loc { margin-top: 2px; font-size: 13px; color: var(--muted); }
+    .s-attrs { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 8px; }
+    .s-attrs li { display: flex; align-items: center; gap: 7px; font-size: 14px; }
+    .s-attrs .ico { width: 16px; height: 16px; color: var(--muted); }
+    .s-h { margin-top: 18px; font-family: var(--serif); font-weight: 700; font-size: 18px; }
+    .s-about { margin-top: 6px; font-size: 14px; line-height: 1.6; }
+    .s-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .s-chips span { display: inline-flex; align-items: center; min-height: 28px; padding: 0 11px; border-radius: 999px; background: #F6F5F3; border: 1px solid rgba(42,36,34,.12); font-size: 13px; }
+
+    /* 聊天卡 */
+    .s-chat { width: min(330px, 100%); display: flex; flex-direction: column; background: #F6F5F3; border-radius: 26px; overflow: hidden; }
+    .s-chathead { display: flex; align-items: center; gap: 10px; padding: 14px 14px 12px; background: #fff; }
+    .s-chathead img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; object-position: center 25%; }
+    .s-chathead b { display: block; font-size: 15px; }
+    .s-chathead span { font-size: 13px; color: var(--muted); }
+    .s-chathead .gear { margin-left: auto; color: var(--muted); }
+    .s-msgs { display: flex; flex-direction: column; gap: 4px; padding: 18px 14px 12px; }
+    .s-sys { align-self: center; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 10px; padding: 5px 12px; border-radius: 999px; background: var(--gold-soft); color: var(--gold-ink); font-size: 13px; font-weight: 600; }
+    .s-sys .ico { width: 14px; height: 14px; }
+    .s-msg { align-self: flex-start; max-width: 80%; padding: 9px 13px; border-radius: 18px; background: #fff; font-size: 14px; line-height: 1.45; }
+    .s-msg.me { align-self: flex-end; background: var(--accent-strong); color: #fff; }
+    .s-time { margin-bottom: 6px; font-size: 13px; color: var(--muted); }
+    .s-time.me { align-self: flex-end; }
+    .s-ice { display: flex; gap: 6px; padding: 0 14px 10px; overflow: hidden; }
+    .s-ice span { flex: none; display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid rgba(220,94,78,.55); background: #fff; color: var(--accent-strong); font-size: 13px; }
+    .s-input { display: flex; align-items: center; gap: 8px; padding: 10px 14px 16px; background: #fff; }
+    .s-input div { flex: 1; height: 38px; display: flex; align-items: center; padding: 0 14px; border-radius: 999px; background: #F6F5F3; border: 1px solid rgba(42,36,34,.1); color: var(--muted); font-size: 14px; }
+    .s-input i { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: #fff; }
+    .s-input i .ico { fill: currentColor; stroke: none; }
+
+    /* ── 安心設計（staggered cells） ── */
+    .cells { padding-block: 0 var(--section); }
+    .cells-inner { padding-inline: var(--margin); max-width: 1680px; margin-inline: auto; }
+    .cells h2 { font-size: var(--step-heading); line-height: 1.2; margin-bottom: 56px; }
+    .cell-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .cell {
+      position: relative; overflow: hidden; min-height: 440px;
+      display: flex; flex-direction: column; background: var(--surface); border-radius: var(--tile);
+    }
+    .cell-text { padding: 28px 28px 24px; }
+    .cell h3 { font-size: var(--step-lead); line-height: 1.35; }
+    .cell p { margin-top: 10px; font-size: var(--step-body); line-height: 1.65; }
+    .cell .frag { margin-top: auto; }
+    .cell.frag-top { flex-direction: column-reverse; }
+    .cell.frag-top .frag { margin-top: 0; margin-bottom: auto; }
+
+    /* 片段共用（App 介面） */
+    .frag { font-family: var(--sans); color: var(--ink); }
+    .frag-panel { background: #fff; padding: 18px; }
+    .cell:not(.frag-top) .frag-panel { margin: 0 28px; border-radius: 18px 18px 0 0; }
+    .cell.frag-top .frag-panel { margin: 0 28px; border-radius: 0 0 18px 18px; }
+    .m-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; }
+    .m-row + .m-row { border-top: 1px solid rgba(42,36,34,.06); } /* taste-skill-ignore：App 列表分隔線 */
+    .m-row img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex: none; }
+    .m-row .m-main { min-width: 0; flex: 1; }
+    .m-row .m-top { display: flex; align-items: center; gap: 8px; }
+    .m-row .m-name { font-weight: 700; font-size: 16px; }
+    .m-row .m-msg { font-size: 14px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .m-row time { font-size: 13px; color: var(--muted); align-self: flex-start; white-space: nowrap; }
+    .gold-chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 999px; background: var(--gold-soft); color: var(--gold-ink); font-size: 13px; font-weight: 600; white-space: nowrap; }
+    .gold-chip svg { width: 13px; height: 13px; }
+    .ice { display: flex; flex-wrap: wrap; gap: 8px; }
+    .ice span { display: inline-flex; align-items: center; min-height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid rgba(220,94,78,.55); color: var(--accent-strong); font-size: 14px; background: #fff; }
+    .ice-input { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+    .ice-input div { flex: 1; min-height: 42px; display: flex; align-items: center; padding: 0 16px; border-radius: 999px; background: #FBF8F4; border: 1px solid rgba(42,36,34,.10); color: var(--muted); font-size: 14px; }
+    .ice-input i { width: 42px; height: 42px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; }
+    .ice-input i svg { width: 18px; height: 18px; }
+    .otp-label { font-size: 14px; color: var(--muted); }
+    .otp { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 12px; }
+    .otp span { aspect-ratio: 4 / 5; display: grid; place-items: center; border-radius: 12px; background: #FBF8F4; border: 1px solid rgba(42,36,34,.12); font-family: var(--serif); font-weight: 700; font-size: 24px; font-variant-numeric: tabular-nums; }
+    .otp span.caret { border-color: var(--accent); }
+    .otp span.caret::after { content: ""; width: 2px; height: 24px; background: var(--accent); animation: blink 1.1s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+    .otp-sent { margin-top: 12px; font-size: 13px; color: var(--muted); }
+    .alert { margin: 0 28px; background: rgba(245,242,239,.98); border-radius: 0 0 16px 16px; text-align: center; }
+    .alert-body { padding: 18px 18px 14px; }
+    .alert-title { font-weight: 700; font-size: 15px; line-height: 1.35; }
+    .alert-msg { margin-top: 6px; font-size: 13px; line-height: 1.5; }
+    .alert-btn { padding: 11px; font-size: 15px; color: #2F6FBF; border-top: 1px solid rgba(42,36,34,.12); } /* taste-skill-ignore：iOS 對話框按鈕分隔 */
+    .alert-btn.strong { font-weight: 600; }
+    .sheet { margin: 0 28px; }
+    .sheet-group { background: #fff; border-radius: 16px; overflow: hidden; }
+    .sheet-group div { padding: 14px; text-align: center; font-size: 16px; }
+    .sheet-group div + div { border-top: 1px solid rgba(42,36,34,.08); } /* taste-skill-ignore：iOS 動作選單分隔 */
+    .sheet-group .danger { color: #C23B2B; font-weight: 600; }
+    .sheet-cancel { margin-top: 8px; font-weight: 600; }
+    /* 貼圖面板（App 內建貼圖） */
+    .stk-tabs { display: flex; gap: 8px; margin-bottom: 10px; }
+    .stk-tabs span { padding: 4px 12px; border-radius: 999px; background: #F6F5F3; color: var(--muted); font-size: 13px; }
+    .stk-tabs span.on { background: var(--accent-soft); color: var(--accent-press); font-weight: 600; }
+    .stk-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+    .stk-grid img { width: 100%; height: auto; }
+
+    /* ── 方案 ── */
+    .plans { padding-block: 0 var(--section); }
+    .plans-title { grid-column: 1 / -1; font-size: var(--step-heading); line-height: 1.2; margin-bottom: 40px; }
+    .plan-list { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); grid-template-rows: auto auto auto 1fr; }
+    .plan { display: contents; }
+    .plan-name {
+      grid-column: 1 / 7; background: none; border: 0; padding: 0; text-align: left;
+      display: inline-flex; align-items: center; gap: .3em; justify-self: start;
+      font-family: var(--serif); font-weight: 700; font-size: var(--step-display); line-height: 1.12; letter-spacing: -0.02em;
+      color: var(--muted); transition: color .2s var(--ease), transform .2s var(--ease);
+    }
+    .plan-name::before { content: ""; width: .3em; height: .3em; border-radius: 50%; background: var(--ink); opacity: 0; transform: scale(.4); transition: opacity .2s var(--ease), transform .2s var(--ease); }
+    .plan-name:hover { color: var(--ink); }
+    .plan-name[aria-expanded="true"] { color: var(--ink); }
+    .plan-name[aria-expanded="true"]::before { opacity: 1; transform: none; }
+    .plan:nth-child(1) .plan-name { grid-row: 1; }
+    .plan:nth-child(2) .plan-name { grid-row: 2; }
+    .plan:nth-child(3) .plan-name { grid-row: 3; }
+    .plan-panel { grid-column: 8 / 13; grid-row: 1 / 5; align-self: start; transition: opacity .25s var(--ease); }
+    .js .plan-panel:not(.is-on) { opacity: 0; visibility: hidden; }
+    .plan-figure { display: flex; align-items: baseline; gap: 14px; }
+    .plan-figure b { font-family: var(--serif); font-weight: 700; font-size: var(--step-display); line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+    .plan-figure span { font-size: var(--step-lead); }
+    .plan-panel > p:not(.plan-figure) { margin-top: 24px; font-size: var(--step-lead); line-height: 1.7; max-width: 26em; }
+    .plan-panel .btn { margin-top: 32px; }
+    .plan-note { grid-column: 8 / 13; margin-top: 40px; font-size: var(--step-small); color: var(--muted); }
+
+    /* ── FAQ ── */
+    .faq { padding-block: 0 var(--section); }
+    .faq-head { grid-column: 1 / 5; align-self: start; }
+    .faq-head h2 { font-size: var(--step-heading); line-height: 1.2; }
+    .faq-head p { margin-top: 20px; font-size: var(--step-body); }
+    .faq-list { grid-column: 5 / 13; display: flex; flex-direction: column; gap: 8px; }
+    .faq details { background: var(--surface); border-radius: var(--tile); transition: background-color .25s var(--ease), color .25s var(--ease); }
+    .faq summary {
+      list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 24px;
+      min-height: 76px; padding: 18px 28px; cursor: pointer;
+      font-size: var(--step-lead); font-weight: 600; line-height: 1.4;
+    }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary:hover .pm { transform: rotate(90deg); }
+    .pm { position: relative; width: 16px; height: 16px; flex: none; transition: transform .25s var(--ease); }
+    .pm::before, .pm::after { content: ""; position: absolute; left: 0; top: 6.5px; width: 16px; height: 3px; border-radius: 2px; background: currentColor; transition: transform .25s var(--ease); }
+    .pm::after { transform: rotate(90deg); }
+    .faq details[open] { background: var(--accent-strong); color: #fff; }
+    .faq details[open] .pm::after { transform: rotate(0deg); }
+    .faq details[open] summary:hover .pm { transform: none; }
+    .answer { padding: 0 28px 28px; }
+    .answer p { font-size: var(--step-body); line-height: 1.75; max-width: 52ch; }
+
+    /* ── CTA ── */
+    .cta { padding-block: 0 clamp(120px, 14vw, 200px); }
+    /* 結尾置中：全頁唯一一處置中，當作收尾 */
+    .cta-main { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .cta h2 { font-size: var(--step-display); line-height: 1.12; }
+    .cta h2 span { display: block; }
+    /* 三個圈的位置：首屏挑過的圈會帶進來，空的位置可以回去挑 */
+    .cta-slots { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 32px; }
+    .slot {
+      display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: 999px;
+      background: var(--surface); color: var(--muted); font-size: var(--step-body); text-decoration: none;
+      transition: background-color .2s var(--ease), color .2s var(--ease), transform .15s var(--ease);
+    }
+    .slot::before { content: ""; width: 12px; height: 12px; flex: none; border-radius: 50%; border: 2px solid currentColor; }
+    a.slot:hover { background: var(--surface-2); color: var(--ink); }
+    a.slot:active { transform: scale(.97); }
+    .slot.is-filled { background: var(--accent-soft); color: var(--accent-press); font-weight: 600; }
+    .slot.is-filled::before { background: currentColor; }
+    .cta-act { margin-top: 36px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 16px 24px; }
+    .cta-note { margin-top: 18px; font-size: var(--step-body); color: var(--muted); }
+
+    /* ── Footer：一行 ── */
+    .foot { display: grid; grid-template-columns: 1fr auto 1fr; align-items: baseline; gap: 24px; padding: 0 var(--margin) 30px; max-width: 1680px; margin-inline: auto; font-size: var(--step-small); }
+    .foot p { color: var(--muted); }
+    .foot nav { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: center; }
+    .foot a { text-decoration: none; }
+    .foot a:hover { color: var(--accent-strong); }
+    .foot .right { text-align: right; }
+
+    /* ── Motion：進場 ── */
+    .js [data-reveal] { opacity: 0; transform: translateY(24px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+    .js [data-reveal].is-in { opacity: 1; transform: none; }
+
+    /* ── 平板 ── */
+    @media (max-width: 1100px) {
+      .nav a.opt { display: none; }
+      .cell-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
 
-    /* Sections */
-    section { padding: 72px 0; }
-    .sec-head { text-align: center; max-width: 660px; margin: 0 auto 48px; }
-    .sec-head h2 { font-size: 32px; margin: 0 0 12px; letter-spacing: 0.5px; }
-    .sec-head p { color: var(--ink2); font-size: 17px; margin: 0; }
-
-    .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
-    .feature {
-      background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 28px 24px;
-      transition: transform .18s ease, box-shadow .18s ease;
+    /* ── 手機與窄平板 ── */
+    @media (max-width: 900px) {
+      .grid, .plan-list { grid-template-columns: minmax(0, 1fr); }
+      .grid > *, .plan-list > *, .plan > * { grid-column: 1 / -1 !important; }
+      .nav a:not(.btn) { display: none; }
+      .bar { height: 68px; }
+      .hero .grid { grid-template-rows: none; }
+      .hero-copy, .hero-picker, .hero-stage { grid-row: auto !important; }
+      .hero-copy { padding: 16px 0 0; }
+      .lead { margin-top: 24px; }
+      .actions { margin-top: 28px; }
+      .hero-stage { order: 2; margin-top: 40px; padding: 0; gap: 22px; }
+      .deck { --back: translateX(12px) rotate(4deg) scale(.95); width: min(330px, calc(100% - 40px)); }
+      .hero-picker { order: 3; padding: 0; }
+      .picker { margin-top: 28px; }
+      .circle-col { margin-top: 48px; }
+      .circles-head { position: static; }
+      .rows { max-width: 560px; }
+      .otp { max-width: 360px; }
+      .show-names { flex-direction: row; flex-wrap: wrap; gap: 4px 20px; margin-top: 32px; }
+      .show-texts { margin-top: 20px; min-height: 0; }
+      .show-stage { margin-top: 36px; }
+      .cell-grid { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+      .cell { min-height: 0; }
+      .cell.frag-top { flex-direction: column; }
+      .cell.frag-top .frag { margin: 0; }
+      .cell .frag-panel, .cell .alert, .cell .sheet { margin: 0 0 0 20px; border-radius: 18px 0 0 0; }
+      .cell:nth-child(even) .frag-panel, .cell:nth-child(even) .alert, .cell:nth-child(even) .sheet { margin: 0 20px 0 0; border-radius: 0 18px 0 0; }
+      .cell .sheet { padding-bottom: 20px; }
+      .cell-text { padding: 24px 20px 20px; }
+      .plans-title { margin-bottom: 24px; }
+      .plan-list { display: block; }
+      .plan { display: block; }
+      .plan-name { padding: 6px 0; }
+      .plan-panel { padding: 8px 0 88px; }
+      .js .plan-panel:not(.is-on) { display: none; }
+      .plan-panel .btn { width: 100%; }
+      .plan-note { margin-top: 8px; }
+      .faq-head { margin-bottom: 28px; }
+      .faq summary { min-height: 64px; padding: 16px 20px; }
+      .answer { padding: 0 20px 20px; }
+      .cta { padding-top: 72px; }
+      .cta-slots { margin-top: 24px; }
+      .cta-act { margin-top: 28px; }
+      .foot { grid-template-columns: 1fr; gap: 8px; padding-bottom: 24px; }
+      .foot nav { justify-content: flex-start; }
+      .foot .right { text-align: left; }
     }
-    .feature:hover { transform: translateY(-4px); box-shadow: 0 16px 36px rgba(0,0,0,0.07); }
-    .ficon {
-      width: 50px; height: 50px; border-radius: 14px; display: grid; place-items: center;
-      background: var(--soft); border: 1px solid var(--soft-line); font-size: 24px; margin-bottom: 16px;
-    }
-    .feature h3 { font-size: 18.5px; margin: 0 0 8px; color: var(--ink); }
-    .feature p { color: var(--ink2); font-size: 15px; margin: 0; }
 
-    /* Screenshot gallery */
-    .gallery { background: var(--soft); border-top: 1px solid var(--soft-line); border-bottom: 1px solid var(--soft-line); }
-    .shots {
-      display: flex; gap: 24px; overflow-x: auto; padding: 6px 22px 22px; justify-content: safe center;
-      scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+    /* 窄手機：交友圈卡片改兩欄，第 6 張（品酒微醺）收起來湊成整數列 */
+    @media (max-width: 639px) {
+      .cgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .cgrid .circ:nth-child(6) { display: none; }
     }
-    .shots::-webkit-scrollbar { height: 8px; }
-    .shots::-webkit-scrollbar-thumb { background: var(--soft-line); border-radius: 999px; }
-    .shot { flex: 0 0 auto; width: 300px; scroll-snap-align: center; text-align: center; }
-    .shot img {
-      width: 100%; height: auto; border-radius: 24px; display: block;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.12);
-    }
-    .shot .cap { margin-top: 14px; font-size: 14.5px; font-weight: 600; color: var(--ink); }
 
-    /* Steps */
-    .steps { }
-    .step-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
-    .step { text-align: center; }
-    .step .num {
-      width: 46px; height: 46px; margin: 0 auto 14px; border-radius: 50%;
-      background: var(--accent); color: #fff; font-weight: 800; font-size: 20px;
-      display: grid; place-items: center; box-shadow: 0 8px 20px rgba(220,94,78,0.35);
-    }
-    .step h3 { font-size: 18px; margin: 0 0 6px; }
-    .step p { color: var(--ink2); font-size: 15px; margin: 0; }
-
-    /* CTA band */
-    .cta-band { text-align: center; }
-    .cta-card {
-      background: linear-gradient(135deg, var(--accent), #f0876f); color: #fff;
-      border-radius: 26px; padding: 54px 30px; box-shadow: 0 24px 60px rgba(220,94,78,0.32);
-    }
-    .cta-card h2 { font-size: 30px; margin: 0 0 12px; color: #fff; }
-    .cta-card p { font-size: 17px; margin: 0 0 26px; opacity: 0.95; }
-    .cta-card .btn { background: #fff; color: var(--accent-d); }
-    .cta-card .btn:hover { background: #fff5f2; }
-
-    /* Footer */
-    footer { border-top: 1px solid var(--line); padding: 40px 0; background: #fff; }
-    .foot-in { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 18px; }
-    .foot-links { display: flex; gap: 22px; flex-wrap: wrap; }
-    .foot-links a { color: var(--ink2); font-size: 14.5px; }
-    .foot-links a:hover { color: var(--accent); }
-    .copy { color: #999; font-size: 13.5px; }
-
-    @media (max-width: 820px) {
-      .hero-grid { grid-template-columns: 1fr; gap: 36px; }
-      .hero { padding: 44px 0; }
-      h1 { font-size: 36px; }
-      .nav-links a:not(.btn) { display: none; }
-      .features, .step-grid { grid-template-columns: 1fr; }
-      section { padding: 56px 0; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .js [data-reveal] { opacity: 1; transform: none; transition: none; }
+      .pcard, .pcard img, .shot, .show-texts p, .plan-panel { transition: none !important; }
+      .pcard.is-on img { transform: none; }
+      .act, .act-like.pop, .sa, .sa.like.pop { transition: none; animation: none; }
+      .otp span.caret::after { animation: none; }
     }
   </style>
 </head>
 <body>
+  <a class="skip" href="#main">跳到主要內容</a>
 
-  <nav>
-    <div class="wrap nav-in">
-      <div class="brand"><span class="logo">F</span>Foci</div>
-      <div class="nav-links">
-        <a href="#features">特色</a>
-        <a href="#gallery">畫面預覽</a>
-        <a href="#how">怎麼開始</a>
-        <a href="/support">支援</a>
-        <a class="btn" href="#download">下載 App</a>
-      </div>
-    </div>
-  </nav>
-
-  <header class="hero">
-    <div class="wrap hero-grid">
-      <div>
-        <span class="tag">以「圈子」為核心的交友體驗</span>
-        <h1>在對的圈子，<br><span class="hl">遇見對的人</span></h1>
-        <p class="lead">Foci 讓你先加入交友圈，再從共同興趣與真實生活圈出發，認識頻率相同的人。不再大海撈針，而是在懂你的圈子裡，自然相遇。</p>
-        <div class="cta-row">
-          <a class="btn" href="#download">免費下載</a>
-          <a class="btn ghost" href="#features">了解更多</a>
-        </div>
-        <div class="store-hint">現已在 App Store 上架 · iPhone 適用</div>
-      </div>
-
-      <div class="hero-shot">
-        <img src="assets/screens/iphone-6.5-1.jpg" width="720" height="1558"
-             alt="Foci App 探索畫面：在對的圈子裡遇見對的人" />
-      </div>
-    </div>
+  <header class="bar">
+    <a class="brand" href="/" aria-label="Foci 首頁">
+      <svg viewBox="116 56 232 150" aria-hidden="true">
+        <circle cx="196" cy="130" r="60" fill="none" stroke="#E2674F" stroke-width="23" />
+        <path d="M 308.9 177.3 A 60 60 0 1 1 308.9 82.7" fill="none" stroke="#F0A58C" stroke-width="23" stroke-linecap="round" />
+        <path d="M 248.0 160.0 A 60 60 0 0 1 150.0 168.6" fill="none" stroke="#E2674F" stroke-width="23" />
+      </svg>
+      <span>Foci</span>
+    </a>
+    <nav class="nav" aria-label="主選單">
+      <a href="#circles">交友圈</a>
+      <a class="opt" href="#how">怎麼用</a>
+      <a class="opt" href="#safety">安心設計</a>
+      <a href="#plans">方案</a>
+      <a href="#faq">常見問題</a>
+      <a class="btn btn-sm" href="#download">即將上架</a>
+    </nav>
   </header>
 
-  <section id="features">
-    <div class="wrap">
-      <div class="sec-head">
-        <h2>為什麼選擇 Foci</h2>
-        <p>把交友拉回真實生活——從興趣與圈子開始，認識值得深交的人。</p>
-      </div>
-      <div class="features">
-        <div class="feature">
-          <div class="ficon">🎯</div>
-          <h3>圈子配對</h3>
-          <p>登山、咖啡、健身、同行業……先加入交友圈，再在你真正在意的圈子裡找人。</p>
+  <main id="main">
+    <!-- ── Hero ── -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="grid">
+        <div class="hero-copy">
+          <h1 id="hero-title" data-reveal><span>先加入交友圈，</span><span>再開始配對</span></h1>
+          <p class="lead" data-reveal>Foci 是以交友圈為核心的交友 App。加入登山、咖啡、同行業或你住的那一區，在圈子裡滑卡，配對時會標出你們的共同圈。</p>
+          <div class="actions" data-reveal>
+            <span class="btn btn-soon">
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M16.37 12.6c-.02-2.2 1.8-3.26 1.88-3.31-1.02-1.5-2.62-1.7-3.19-1.72-1.36-.14-2.65.8-3.34.8-.69 0-1.75-.78-2.88-.76-1.48.02-2.85.86-3.61 2.19-1.54 2.67-.39 6.62 1.11 8.79.73 1.06 1.6 2.25 2.75 2.2 1.1-.04 1.52-.71 2.85-.71 1.33 0 1.71.71 2.88.69 1.19-.02 1.94-1.08 2.66-2.14.84-1.23 1.19-2.42 1.21-2.48-.03-.01-2.31-.89-2.32-3.55zM14.18 6.13c.61-.74 1.02-1.76.91-2.78-.88.04-1.94.59-2.57 1.32-.56.65-1.06 1.69-.93 2.69.98.08 1.98-.5 2.59-1.23z"/></svg>
+              App Store 即將上架
+            </span>
+            <a class="text-link" href="#circles">看全部 30 個圈</a>
+          </div>
         </div>
-        <div class="feature">
-          <div class="ficon">📇</div>
-          <h3>完整檔案</h3>
-          <p>身高、職業、交友目的與共同圈，先讀懂一個人，再決定喜歡。</p>
-        </div>
-        <div class="feature">
-          <div class="ficon">💬</div>
-          <h3>有交集的配對</h3>
-          <p>每段配對都標示著共同圈，對話從同一件喜歡的事自然開始。</p>
-        </div>
-        <div class="feature">
-          <div class="ficon">🧊</div>
-          <h3>破冰不尷尬</h3>
-          <p>內建破冰問句與共同圈情境，第一句話不再難開口。</p>
-        </div>
-        <div class="feature">
-          <div class="ficon">🛡️</div>
-          <h3>安全社群</h3>
-          <p>檢舉與封鎖機制、人機驗證與嚴謹的隱私保護，讓你安心做自己。</p>
-        </div>
-        <div class="feature">
-          <div class="ficon">🔒</div>
-          <h3>隱私至上</h3>
-          <p>資料加密傳輸、權限可控，你的個人資訊由你決定如何分享。</p>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <section id="gallery" class="gallery">
-    <div class="wrap">
-      <div class="sec-head">
-        <h2>畫面預覽</h2>
-        <p>從加入圈子到聊出火花，看看 Foci 怎麼運作。</p>
-      </div>
-    </div>
-    <div class="shots">
-      <div class="shot">
-        <img src="assets/screens/iphone-6.5-2.jpg" loading="lazy" width="720" height="1558" alt="先加入交友圈，再開始配對" />
-      </div>
-      <div class="shot">
-        <img src="assets/screens/iphone-6.5-3.jpg" loading="lazy" width="720" height="1558" alt="完整個人檔案：先讀懂一個人，再決定喜歡" />
-      </div>
-      <div class="shot">
-        <img src="assets/screens/iphone-6.5-1.jpg" loading="lazy" width="720" height="1558" alt="探索與配對：在對的圈子裡，遇見對的人" />
-      </div>
-      <div class="shot">
-        <img src="assets/screens/iphone-6.5-4.jpg" loading="lazy" width="720" height="1558" alt="配對來自你的交友圈" />
-      </div>
-      <div class="shot">
-        <img src="assets/screens/iphone-6.5-5.jpg" loading="lazy" width="720" height="1558" alt="破冰更自然，話題不尷尬" />
-      </div>
-    </div>
-  </section>
+        <div class="hero-picker" id="picker">
+          <div class="picker" data-ui data-reveal>
+            <div class="picker-head">
+              <p id="picker-title">選你在意的圈，最多 3 個</p>
+              <p class="picker-count"><span id="pick-count">1</span>/3（免費）</p>
+            </div>
+            <div class="chips" role="group" aria-labelledby="picker-title" id="chips">
+              <button class="chip" type="button" aria-pressed="false" data-c="登山健行"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>登山健行</button>
+              <button class="chip" type="button" aria-pressed="true" data-c="精品咖啡"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>精品咖啡</button>
+              <button class="chip" type="button" aria-pressed="false" data-c="攝影同好"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>攝影同好</button>
+              <button class="chip" type="button" aria-pressed="false" data-c="重訓健身"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>重訓健身</button>
+              <button class="chip" type="button" aria-pressed="false" data-c="美食探店"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>美食探店</button>
+              <button class="chip" type="button" aria-pressed="false" data-c="旅行揪伴"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>旅行揪伴</button>
+              <button class="chip" type="button" aria-pressed="false" data-c="品酒微醺"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>品酒微醺</button>
+              <button class="chip" type="button" aria-pressed="false" data-c="電影同好"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>電影同好</button>
+              <button class="chip" type="button" aria-pressed="false" data-c="獨立音樂"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>獨立音樂</button>
+              <button class="chip" type="button" aria-pressed="false" data-c="閱讀書友"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>閱讀書友</button>
+              <button class="chip" type="button" aria-pressed="false" data-c="瑜伽冥想"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>瑜伽冥想</button>
+              <button class="chip" type="button" aria-pressed="false" data-c="創作者"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>創作者</button>
+            </div>
+            <p class="picker-result" id="pick-result">和你同圈 2 位：<b>思妤、子睿</b></p>
+            <p class="picker-note" id="pick-note" aria-live="polite"></p>
+          </div>
+        </div>
 
-  <section id="how" class="steps">
-    <div class="wrap">
-      <div class="sec-head">
-        <h2>三步開始</h2>
-        <p>幾分鐘就能加入屬於你的圈子。</p>
-      </div>
-      <div class="step-grid">
-        <div class="step">
-          <div class="num">1</div>
-          <h3>建立檔案</h3>
-          <p>填寫興趣與自我介紹，讓 Foci 認識真正的你。</p>
-        </div>
-        <div class="step">
-          <div class="num">2</div>
-          <h3>加入交友圈</h3>
-          <p>挑選登山、咖啡、健身等你在意的圈子。</p>
-        </div>
-        <div class="step">
-          <div class="num">3</div>
-          <h3>開始聊天</h3>
-          <p>從共同話題破冰，認識值得深交的對象。</p>
+        <div class="hero-stage" data-reveal>
+          <div class="deck swipe" id="deck" data-ui tabindex="0" aria-label="同圈的人：往左滑略過、往右滑喜歡、往上滑超級喜歡，也可以用方向鍵">
+            <article class="pcard is-on" data-id="siyu">
+              <img src="assets/people/siyu.jpg" width="720" height="987" alt="思妤的檔案照片（示意）" />
+              <div class="pcard-info">
+                <p class="pcard-name">思妤<span>29</span></p>
+                <p class="pcard-meta">2.3 km ・ 台北 ・ 品牌企劃</p>
+                <p class="pcard-bio">咖啡廳是我的第二個家。會手沖也會拉花，最近在練習烘豆。</p>
+                <p class="pcard-tags"><span class="shared">共同圈 ・ 精品咖啡</span><span>閱讀書友</span><span>攝影同好</span></p>
+              </div>
+            </article>
+          </div>
+          <div class="deck-actions" data-ui>
+            <button class="act act-pass" type="button" id="act-pass" aria-label="略過，看下一位"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+            <button class="act act-like" type="button" id="act-like" aria-label="喜歡，看下一位"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3s-7.6-4.6-7.6-10.4A4.4 4.4 0 0 1 12 7.2a4.4 4.4 0 0 1 7.6 2.7c0 5.8-7.6 10.4-7.6 10.4z" fill="currentColor"/></svg></button>
+          </div>
+          <p class="sr-only" id="deck-status" aria-live="polite"></p>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section id="download" class="cta-band">
-    <div class="wrap">
-      <div class="cta-card">
-        <h2>準備好遇見對的人了嗎？</h2>
-        <p>立即下載 Foci，加入屬於你的圈子。</p>
-        <a class="btn" href="#" aria-label="前往 App Store 下載 Foci">前往 App Store 下載</a>
-      </div>
-    </div>
-  </section>
+    <!-- ── 交友圈清單 ── -->
+    <section class="circles" id="circles" aria-labelledby="circles-title">
+      <div class="grid">
+        <div class="circles-head" data-reveal>
+          <h2 id="circles-title">目前開放的 30 個交友圈</h2>
+          <p>興趣、身份、地區三類，另有 3 個設了加入條件的圈。免費版可以同時加入 3 個，VIP 8 個，VIP+ 不限。</p>
+          <a class="text-link" href="#plans">比較三種方案</a>
+        </div>
 
-  <footer>
-    <div class="wrap foot-in">
-      <div class="brand"><span class="logo">F</span>Foci</div>
-      <div class="foot-links">
-        <a href="#features">特色</a>
-        <a href="#gallery">畫面預覽</a>
-        <a href="#how">怎麼開始</a>
-        <a href="/support">支援中心</a>
-        <a href="/privacy">隱私權政策</a>
-        <a href="/terms">使用條款</a>
-        <a href="mailto:support@foci-app.com">聯絡我們</a>
+        <div class="circle-col" data-reveal>
+          <h3>興趣圈<small>14 個</small></h3>
+          <ul class="rows">
+            <li><span class="ring"></span><span class="name">登山健行</span><span class="val">郊山到百岳</span></li>
+            <li><span class="ring"></span><span class="name">精品咖啡</span><span class="val">手沖、跑店</span></li>
+            <li><span class="ring"></span><span class="name">攝影同好</span><span class="val">底片、街拍</span></li>
+            <li><span class="ring"></span><span class="name">獨立音樂</span><span class="val">Live House</span></li>
+            <li><span class="ring"></span><span class="name">桌遊愛好</span><span class="val">揪團開桌</span></li>
+            <li><span class="ring"></span><span class="name">重訓健身</span><span class="val">課表交流</span></li>
+            <li><span class="ring"></span><span class="name">貓奴集合</span><span class="val">曬貓、養貓</span></li>
+            <li><span class="ring"></span><span class="name">狗派日常</span><span class="val">寵物友善景點</span></li>
+            <li><span class="ring"></span><span class="name">美食探店</span><span class="val">揪飯局</span></li>
+            <li><span class="ring"></span><span class="name">旅行揪伴</span><span class="val">揪伴同遊</span></li>
+            <li><span class="ring"></span><span class="name">電影同好</span><span class="val">院線、影展</span></li>
+            <li><span class="ring"></span><span class="name">閱讀書友</span><span class="val">選書、讀書會</span></li>
+            <li><span class="ring"></span><span class="name">瑜伽冥想</span><span class="val">身心平衡</span></li>
+            <li><span class="ring"></span><span class="name">品酒微醺</span><span class="val">紅白酒、威士忌</span></li>
+          </ul>
+        </div>
+
+        <div class="circle-col" data-reveal>
+          <h3>身份圈<small>8 個</small></h3>
+          <ul class="rows">
+            <li><span class="ring"></span><span class="name">軟體工程師</span><span class="val">上班寫程式的人</span></li>
+            <li><span class="ring"></span><span class="name">醫護人員</span><span class="val">懂你的班表</span></li>
+            <li><span class="ring"></span><span class="name">設計師圈</span><span class="val">UI/UX、平面、產品</span></li>
+            <li><span class="ring"></span><span class="name">新創圈</span><span class="val">早期團隊</span></li>
+            <li><span class="ring"></span><span class="name">金融業</span><span class="val">銀行、投資、保險</span></li>
+            <li><span class="ring"></span><span class="name">教師圈</span><span class="val">各級教師</span></li>
+            <li><span class="ring"></span><span class="name">留學海歸</span><span class="val">待過異鄉的人</span></li>
+            <li><span class="ring"></span><span class="name">創作者</span><span class="val">接案、自由業</span></li>
+          </ul>
+          <h3>地區圈<small>5 個</small></h3>
+          <ul class="rows">
+            <li><span class="ring region"></span><span class="name">台北信義</span><span class="val">101 到吳興街</span></li>
+            <li><span class="ring region"></span><span class="name">台北大安</span><span class="val">師大、公園一帶</span></li>
+            <li><span class="ring region"></span><span class="name">新竹竹科</span><span class="val">竹科生活圈</span></li>
+            <li><span class="ring region"></span><span class="name">台中西屯</span><span class="val">七期、逢甲</span></li>
+            <li><span class="ring region"></span><span class="name">高雄生活圈</span><span class="val">駁二到鹽埕</span></li>
+          </ul>
+          <h3>有加入條件<small>3 個</small></h3>
+          <ul class="rows">
+            <li><span class="ring gate"></span><span class="name">女性安心圈</span><span class="val">限女性</span></li>
+            <li><span class="ring gate"></span><span class="name">熟齡交友 40+</span><span class="val">40 歲以上</span></li>
+            <li><span class="ring gate"></span><span class="name">青年交友 18–28</span><span class="val">18 到 28 歲</span></li>
+          </ul>
+        </div>
       </div>
-      <div class="copy">© 2026 Foci. 在對的圈子，遇見對的人。</div>
-    </div>
+    </section>
+
+    <!-- ── App 畫面 ── -->
+    <section class="show" id="how" aria-labelledby="how-title">
+      <div class="grid">
+        <div class="show-index">
+          <h2 id="how-title" data-reveal>從加入圈子，到第一句話</h2>
+          <div class="show-names" role="tablist" aria-label="App 畫面" data-reveal>
+            <button type="button" role="tab" id="tab-circles" aria-selected="true" aria-controls="shot-circles" data-k="circles"><svg class="tab-ring" viewBox="0 0 22 22" aria-hidden="true"><circle class="track" cx="11" cy="11" r="8.5"/><circle class="fill" cx="11" cy="11" r="8.5" pathLength="100"/></svg>交友圈</button>
+            <button type="button" role="tab" id="tab-explore" aria-selected="false" aria-controls="shot-explore" data-k="explore" tabindex="-1"><svg class="tab-ring" viewBox="0 0 22 22" aria-hidden="true"><circle class="track" cx="11" cy="11" r="8.5"/><circle class="fill" cx="11" cy="11" r="8.5" pathLength="100"/></svg>探索</button>
+            <button type="button" role="tab" id="tab-profile" aria-selected="false" aria-controls="shot-profile" data-k="profile" tabindex="-1"><svg class="tab-ring" viewBox="0 0 22 22" aria-hidden="true"><circle class="track" cx="11" cy="11" r="8.5"/><circle class="fill" cx="11" cy="11" r="8.5" pathLength="100"/></svg>完整檔案</button>
+            <button type="button" role="tab" id="tab-chat" aria-selected="false" aria-controls="shot-chat" data-k="chat" tabindex="-1"><svg class="tab-ring" viewBox="0 0 22 22" aria-hidden="true"><circle class="track" cx="11" cy="11" r="8.5"/><circle class="fill" cx="11" cy="11" r="8.5" pathLength="100"/></svg>破冰聊天</button>
+          </div>
+          <div class="show-texts" data-reveal>
+            <p class="is-on" data-k="circles">興趣、身份、地區都有圈，有些圈設了加入條件，例如只限女性。先加入你在意的圈子，再在圈子裡滑卡。</p>
+            <p data-k="explore">在你加入的圈子裡滑卡。卡片上有距離、城市、自我介紹和興趣標籤，喜歡就按愛心，雙方都喜歡就配對成功。</p>
+            <p data-k="profile">身高、職業、學校、感情狀況、語言，往下滑一次看完。先讀懂一個人，再決定要不要按喜歡。</p>
+            <p data-k="chat">聊天室第一行寫著你們在哪個圈配對，輸入框上方有現成的破冰問句，點一下就送出。</p>
+          </div>
+        </div>
+        <div class="show-stage" data-reveal>
+          <!-- 交友圈卡片 -->
+          <div class="shot is-on" id="shot-circles" role="tabpanel" aria-labelledby="tab-circles" data-k="circles" data-ui>
+            <div class="cgrid">
+              <article class="circ ui-card">
+                <div class="s-cover" style="--c:#96604F"><b>登山健行</b></div>
+                <p>揪團爬山、走步道、追百岳，不限程度。</p>
+                <div class="circ-foot"><span>興趣圈</span><em>開放加入</em></div>
+              </article>
+              <article class="circ ui-card">
+                <div class="s-cover" style="--c:#7A5A44"><b>精品咖啡</b></div>
+                <p>手沖、義式、找新咖啡館，交換口袋名單。</p>
+                <div class="circ-foot"><span>興趣圈</span><em>開放加入</em></div>
+              </article>
+              <article class="circ ui-card">
+                <div class="s-cover" style="--c:#4F5D6B"><b>攝影同好</b></div>
+                <p>底片、街拍、風景，一起出門拍照。</p>
+                <div class="circ-foot"><span>興趣圈</span><em>開放加入</em></div>
+              </article>
+              <article class="circ ui-card">
+                <div class="s-cover" style="--c:#A85C4F"><b>重訓健身</b></div>
+                <p>課表交流、找運動夥伴，一起進步。</p>
+                <div class="circ-foot"><span>興趣圈</span><em>開放加入</em></div>
+              </article>
+              <article class="circ ui-card">
+                <div class="s-cover" style="--c:#9C6A3E"><b>旅行揪伴</b></div>
+                <p>國內外旅行、揪伴同遊與行程分享。</p>
+                <div class="circ-foot"><span>興趣圈</span><em>開放加入</em></div>
+              </article>
+              <article class="circ ui-card">
+                <div class="s-cover" style="--c:#7E5563"><b>品酒微醺</b></div>
+                <p>紅白酒、威士忌、調酒的小酌同好。</p>
+                <div class="circ-foot"><span>興趣圈</span><em>開放加入</em></div>
+              </article>
+              <article class="circ ui-card">
+                <div class="s-cover" style="--c:#5B7898"><b>金融業</b></div>
+                <p>銀行、投資、保險與財經從業者。</p>
+                <div class="circ-foot"><span>身份圈</span><em>開放加入</em></div>
+              </article>
+              <article class="circ ui-card">
+                <div class="s-cover" style="--c:#4E7A62"><b>台北大安</b></div>
+                <p>大安區生活圈，步行就能約到的距離。</p>
+                <div class="circ-foot"><span>地區圈</span><em>開放加入</em></div>
+              </article>
+              <article class="circ ui-card">
+                <div class="s-cover" style="--c:#A8566E"><b>女性安心圈</b></div>
+                <p>限女性加入，可以更自在地慢慢認識人。</p>
+                <div class="circ-foot"><span>身份圈</span><em class="gate">限女性</em></div>
+              </article>
+            </div>
+          </div>
+
+          <!-- 探索：可以左滑、右滑、上滑的卡片堆 -->
+          <div class="shot" id="shot-explore" role="tabpanel" aria-labelledby="tab-explore" data-k="explore" data-ui>
+            <div class="s-deck swipe" id="ex-deck" tabindex="0" aria-label="探索卡片：往左滑略過、往右滑喜歡、往上滑超級喜歡，也可以用方向鍵">
+              <article class="s-card ui-card is-top">
+                <img src="assets/people/caijie.jpg" width="720" height="987" loading="lazy" alt="采潔的檔案照片（示意）" />
+                <div class="pcard-info">
+                  <p class="pcard-name">采潔<span>28</span></p>
+                  <p class="pcard-meta">3.2 km ・ 台北 ・ 美食編輯</p>
+                  <p class="pcard-bio">美食編輯，吃遍台北是我的工作也是興趣。最懂巷弄裡的隱藏名單。</p>
+                  <p class="pcard-tags"><span class="shared">共同圈 ・ 美食探店</span><span>品酒微醺</span></p>
+                </div>
+              </article>
+            </div>
+            <div class="s-actions">
+              <button class="sa sm" type="button" id="ex-undo" aria-label="回到上一位" disabled><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 8L5 12l4 4M5 12h9a5 5 0 0 1 0 10h-2"/></svg></button>
+              <button class="sa" type="button" id="ex-pass" aria-label="略過"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg></button>
+              <button class="sa star" type="button" id="ex-super" aria-label="超級喜歡，剩 15 次"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg><b id="ex-super-n">15</b></button>
+              <button class="sa like" type="button" id="ex-like" aria-label="喜歡"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3s-7.6-4.6-7.6-10.4A4.4 4.4 0 0 1 12 7.2a4.4 4.4 0 0 1 7.6 2.7c0 5.8-7.6 10.4-7.6 10.4z"/></svg></button>
+              <span class="sa sm" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg></span>
+            </div>
+            <p class="sr-only" id="ex-status" aria-live="polite"></p>
+          </div>
+
+          <!-- 完整檔案卡 -->
+          <div class="shot" id="shot-profile" role="tabpanel" aria-labelledby="tab-profile" data-k="profile" data-ui>
+            <div class="s-profile ui-card">
+              <div class="s-photo">
+                <img src="assets/people/mia.jpg" width="720" height="987" loading="lazy" alt="Mia 的檔案照片（示意）" />
+                <i aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></i>
+              </div>
+              <div class="s-body">
+                <p class="s-pname">Mia<span>30</span></p>
+                <p class="s-loc">台北 ・ 天蠍座</p>
+                <ul class="s-attrs">
+                  <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 16L16 3l5 5L8 21zM7 12l2 2M10 9l2 2M13 6l2 2"/></svg>167 cm</li>
+                  <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5h6v2M3 12h18"/></svg>健身教練</li>
+                  <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5zM6 11v5c3 2 9 2 12 0v-5"/></svg>體育大學</li>
+                  <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-9.6A4 4 0 0 1 12 8a4 4 0 0 1 7 2.4C19 15.6 12 20 12 20z"/></svg>單身</li>
+                  <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.5 3.3-5.5 6.5-5.5s5.9 2 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c2 .7 3.2 2.4 3.6 5.2"/></svg>沒有小孩</li>
+                  <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>中文、英文</li>
+                </ul>
+                <p class="s-h">關於我</p>
+                <p class="s-about">健身教練，相信流汗是最好的保養。從討厭運動到愛上運動，現在想把這份能量帶給更多人。</p>
+                <p class="s-h">興趣</p>
+                <p class="s-chips"><span>健身</span><span>拳擊</span><span>慢跑</span><span>料理</span></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 聊天卡 -->
+          <div class="shot" id="shot-chat" role="tabpanel" aria-labelledby="tab-chat" data-k="chat" data-ui>
+            <div class="s-chat ui-card">
+              <div class="s-chathead">
+                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+                <img src="assets/people/ryan.jpg" width="720" height="987" loading="lazy" alt="" />
+                <div><b>Ryan</b><span>1 天前上線</span></div>
+                <svg class="ico gear" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="12" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/><circle cx="18.5" cy="12" r="1.3" fill="currentColor"/></svg>
+              </div>
+              <div class="s-msgs">
+                <p class="s-sys"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.5 3.3-5.5 6.5-5.5s5.9 2 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c2 .7 3.2 2.4 3.6 5.2"/></svg>你們在「登山健行」配對成功</p>
+                <p class="s-msg me">你週末有空嗎？想約大安森林公園晨跑</p>
+                <p class="s-time me">23:19 已讀</p>
+                <p class="s-msg">好啊！大概幾點？</p>
+                <p class="s-time">23:21</p>
+                <p class="s-msg me">早上七點會不會太早</p>
+                <p class="s-time me">23:23 已讀</p>
+                <p class="s-msg">不會，我可以！順便帶咖啡給妳</p>
+                <p class="s-time">23:25</p>
+              </div>
+              <div class="s-ice" aria-hidden="true"><span>你最近拍的一張照片是？</span><span>週末通常都在做什麼？</span></div>
+              <div class="s-input" aria-hidden="true">
+                <div>輸入訊息…</div>
+                <i><svg class="ico" viewBox="0 0 24 24"><path d="M4 12l15-7-5 15-2.5-6.5z"/></svg></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 安心設計 ── -->
+    <section class="cells" id="safety" aria-labelledby="safety-title">
+      <div class="cells-inner">
+        <h2 id="safety-title" data-reveal>聊得開，也放心</h2>
+        <div class="cell-grid">
+          <article class="cell" data-reveal>
+            <div class="cell-text">
+              <h3>每段配對都標出共同圈</h3>
+              <p>聊天列表上，名字旁邊就寫著你們在哪個圈認識。第一句話有話題，不用想破頭。</p>
+            </div>
+            <div class="frag frag-panel" data-ui>
+              <div class="m-row">
+                <img src="assets/people/siyu.jpg" width="720" height="987" loading="lazy" alt="" />
+                <div class="m-main"><div class="m-top"><span class="m-name">思妤</span><span class="gold-chip"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="6" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="10" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>精品咖啡</span></div><p class="m-msg">那間的手沖真的不錯，週末一起去？</p></div>
+                <time>8 分鐘前</time>
+              </div>
+              <div class="m-row">
+                <img src="assets/people/mia.jpg" width="720" height="987" loading="lazy" alt="" />
+                <div class="m-main"><div class="m-top"><span class="m-name">Mia</span><span class="gold-chip"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="6" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="10" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>重訓健身</span></div><p class="m-msg">哈哈哈 不能逃避腿日喔</p></div>
+                <time>13 分鐘前</time>
+              </div>
+              <div class="m-row">
+                <img src="assets/people/ryan.jpg" width="720" height="987" loading="lazy" alt="" />
+                <div class="m-main"><div class="m-top"><span class="m-name">Ryan</span><span class="gold-chip"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="6" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="10" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>旅行揪伴</span></div><p class="m-msg">下個月想去花蓮，有推薦的嗎</p></div>
+                <time>25 分鐘前</time>
+              </div>
+            </div>
+          </article>
+
+          <article class="cell frag-top" data-reveal>
+            <div class="cell-text">
+              <h3>破冰問句就在輸入框上方</h3>
+              <p>不知道怎麼開口的時候，點一下問句就送出。之後要聊什麼，交給你們自己。</p>
+            </div>
+            <div class="frag frag-panel" data-ui>
+              <div class="ice">
+                <span>你最近拍的一張照片是？</span>
+                <span>週末通常都在做什麼？</span>
+                <span>推薦一間你的口袋咖啡館</span>
+              </div>
+              <div class="ice-input">
+                <div>輸入訊息…</div>
+                <i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l15-7-5 15-2.5-6.5z" fill="#fff"/></svg></i>
+              </div>
+            </div>
+          </article>
+
+          <article class="cell" data-reveal>
+            <div class="cell-text">
+              <h3>不用密碼，用 Email 驗證碼登入</h3>
+              <p>每次登入寄一組 6 位數驗證碼到你的信箱。不用記密碼，也就沒有密碼可以外洩。</p>
+            </div>
+            <div class="frag frag-panel" data-ui>
+              <p class="otp-label">輸入 6 位數驗證碼</p>
+              <div class="otp" aria-hidden="true"><span>4</span><span>8</span><span>2</span><span>9</span><span>1</span><span class="caret"></span></div>
+              <p class="otp-sent">驗證碼已寄到 you@example.com</p>
+            </div>
+          </article>
+
+          <article class="cell frag-top" data-reveal>
+            <div class="cell-text">
+              <h3>位置只在你按下時讀一次</h3>
+              <p>Foci 用位置計算距離、推薦附近的人。只有你主動取得位置時才讀一次座標，不會在背景持續追蹤。</p>
+            </div>
+            <div class="frag alert" data-ui>
+              <div class="alert-body">
+                <p class="alert-title">要允許「Foci」使用你的位置嗎？</p>
+                <p class="alert-msg">Foci 需要你的位置，以便依距離為你推薦附近的配對對象。我們僅在你主動取得位置時讀取單次座標，不會持續追蹤。</p>
+              </div>
+              <div class="alert-btn">僅允許一次</div>
+              <div class="alert-btn">使用 App 期間允許</div>
+              <div class="alert-btn strong">不允許</div>
+            </div>
+          </article>
+
+          <article class="cell" data-reveal>
+            <div class="cell-text">
+              <h3>封鎖是雙向的</h3>
+              <p>封鎖之後，你們在探索和聊天裡都看不到彼此。遇到不舒服的訊息也可以直接檢舉。</p>
+            </div>
+            <div class="frag sheet" data-ui>
+              <div class="sheet-group">
+                <div class="danger">封鎖對方</div>
+                <div>檢舉</div>
+                <div>取消配對</div>
+              </div>
+              <div class="sheet-group sheet-cancel"><div>取消</div></div>
+            </div>
+          </article>
+
+          <article class="cell frag-top" data-reveal>
+            <div class="cell-text">
+              <h3>只能傳文字和貼圖</h3>
+              <p>聊天不開放傳照片，只能傳文字和 Foci 內建的 90 張貼圖，不會突然收到你不想看的圖片。</p>
+            </div>
+            <div class="frag frag-panel" data-ui>
+              <div class="stk-tabs" aria-hidden="true"><span class="on">日常打招呼</span><span>心情表情</span></div>
+              <div class="stk-grid">
+                <img src="assets/stickers/cat-morning.png" width="160" height="160" loading="lazy" alt="貼圖：早安" />
+                <img src="assets/stickers/cat-hello.png" width="160" height="160" loading="lazy" alt="貼圖：哈囉" />
+                <img src="assets/stickers/cat-eaten.png" width="160" height="160" loading="lazy" alt="貼圖：吃飽沒？" />
+                <img src="assets/stickers/cat-thanks.png" width="160" height="160" loading="lazy" alt="貼圖：謝謝" />
+                <img src="assets/stickers/cat-goodnight.png" width="160" height="160" loading="lazy" alt="貼圖：晚安" />
+                <img src="assets/stickers/cat-cheer.png" width="160" height="160" loading="lazy" alt="貼圖：加油" />
+                <img src="assets/stickers/cat-there.png" width="160" height="160" loading="lazy" alt="貼圖：在嗎？" />
+                <img src="assets/stickers/cat-okay.png" width="160" height="160" loading="lazy" alt="貼圖：好喔" />
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 方案 ── -->
+    <section class="plans" id="plans" aria-labelledby="plans-title">
+      <div class="grid">
+        <h2 class="plans-title" id="plans-title" data-reveal>免費就能加入 3 個圈</h2>
+        <div class="plan-list" data-reveal>
+          <div class="plan">
+            <button class="plan-name" type="button" aria-expanded="false" aria-controls="plan-free" data-p="free">免費</button>
+            <div class="plan-panel" id="plan-free">
+              <p class="plan-figure"><b>3</b><span>個交友圈</span></p>
+              <p>每天滑 30 張卡，看得到最近 3 筆滑卡記錄。配對、聊天、破冰問句都不用付費。</p>
+            </div>
+          </div>
+          <div class="plan">
+            <button class="plan-name" type="button" aria-expanded="true" aria-controls="plan-vip" data-p="vip">VIP</button>
+            <div class="plan-panel is-on" id="plan-vip">
+              <p class="plan-figure"><b>8</b><span>個交友圈</span></p>
+              <p>不限滑卡次數，直接看到誰已經喜歡你。另有進階篩選、無痕瀏覽、10 筆滑卡記錄、3 組 VIP 專屬貼圖，每月 5 次 Super Like 和 1 次 Boost。</p>
+            </div>
+          </div>
+          <div class="plan">
+            <button class="plan-name" type="button" aria-expanded="false" aria-controls="plan-plus" data-p="plus">VIP+</button>
+            <div class="plan-panel" id="plan-plus">
+              <p class="plan-figure"><b>不限</b><span>交友圈數量</span></p>
+              <p>包含所有 VIP 權益，每月 15 次 Super Like、每週 1 次 Boost，推薦排序也會優先讓你被看見。</p>
+            </div>
+          </div>
+          <p class="plan-note">VIP 與 VIP+ 透過 App Store 訂閱，可選 1、3 或 12 個月，價格以 App 內顯示為準，可隨時在 Apple ID 設定中取消。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FAQ ── -->
+    <section class="faq" id="faq" aria-labelledby="faq-title">
+      <div class="grid">
+        <div class="faq-head" data-reveal>
+          <h2 id="faq-title">常見問題</h2>
+          <p>其他問題可以到<a class="text-link" href="/support">支援中心</a>，或寫信到 <a class="text-link" href="mailto:support@foci-app.com">support@foci-app.com</a>。</p>
+        </div>
+        <div class="faq-list" data-reveal>
+          <details name="faq">
+            <summary>Foci 要付費嗎？<i class="pm" aria-hidden="true"></i></summary>
+            <div class="answer"><p>不用。免費版可以加入 3 個交友圈、每天滑 30 張卡，配對和聊天都免費。想加入更多圈、看誰喜歡你，再考慮 VIP 或 VIP+。</p></div>
+          </details>
+          <details name="faq">
+            <summary>沒有密碼，要怎麼登入？<i class="pm" aria-hidden="true"></i></summary>
+            <div class="answer"><p>輸入 Email，Foci 會寄一組 6 位數驗證碼給你，填進去就登入了。帳號沒有密碼，所以也沒有密碼會被盜用。</p></div>
+          </details>
+          <details name="faq">
+            <summary>加入的交友圈可以退出嗎？<i class="pm" aria-hidden="true"></i></summary>
+            <div class="answer"><p>可以，在圈子頁面直接退出。空出來的名額可以拿去加入別的圈。</p></div>
+          </details>
+          <details name="faq">
+            <summary>我的位置會被追蹤嗎？<i class="pm" aria-hidden="true"></i></summary>
+            <div class="answer"><p>不會。只有你主動取得位置時，Foci 才讀一次座標，用來計算距離和推薦附近的人，不會在背景持續追蹤。定位權限可以隨時在「帳號與隱私」裡關掉。</p></div>
+          </details>
+          <details name="faq">
+            <summary>遇到讓人不舒服的對象怎麼辦？<i class="pm" aria-hidden="true"></i></summary>
+            <div class="answer"><p>在對方的檔案或聊天室裡可以封鎖或檢舉。封鎖是雙向的，之後你們在探索和聊天裡都看不到彼此；檢舉會交給 Foci 團隊處理，進度可以在「我的檢舉紀錄」查看。</p></div>
+          </details>
+          <details name="faq">
+            <summary>聊天可以傳照片嗎？<i class="pm" aria-hidden="true"></i></summary>
+            <div class="answer"><p>不行。聊天只能傳文字和 Foci 內建的貼圖，避免收到你不想看到的圖片。</p></div>
+          </details>
+          <details name="faq">
+            <summary>怎麼刪除帳號？<i class="pm" aria-hidden="true"></i></summary>
+            <div class="answer"><p>在 App 裡進入「我的 → 帳號與隱私 → 刪除帳號」。只是想休息一陣子的話，也可以選「暫停帳號」。</p></div>
+          </details>
+          <details name="faq">
+            <summary>有 Android 版嗎？<i class="pm" aria-hidden="true"></i></summary>
+            <div class="answer"><p>目前提供 iPhone 版本。</p></div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CTA ── -->
+    <section class="cta" id="download" aria-labelledby="cta-title">
+      <div class="grid">
+        <div class="cta-main">
+          <h2 id="cta-title" data-reveal><span>先挑三個圈，</span><span>其他交給緣分</span></h2>
+          <div class="cta-slots" id="cta-slots" data-reveal aria-label="你挑的交友圈">
+            <span class="slot is-filled">精品咖啡</span>
+            <a class="slot" href="#picker">再挑一個</a>
+            <a class="slot" href="#picker">再挑一個</a>
+          </div>
+          <div class="cta-act" data-reveal>
+            <span class="btn btn-soon">App Store 即將上架</span>
+          </div>
+          <p class="cta-note" data-reveal>上架後免費下載，iPhone 適用。</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Foci ・ 以交友圈為核心的交友 App<br />頁面中的人物、檔案與對話皆為示意</p>
+    <nav aria-label="頁尾連結">
+      <a href="/support">支援中心</a>
+      <a href="/terms">使用條款</a>
+      <a href="mailto:support@foci-app.com">聯絡我們</a>
+    </nav>
+    <p class="right">© 2026 Foci ・ <a href="/privacy">隱私權政策</a></p>
   </footer>
 
+  <script>
+  (function () {
+    var root = document.documentElement;
+    root.classList.add('js');
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function revealAll() {
+      document.querySelectorAll('[data-reveal]').forEach(function (el) { el.classList.add('is-in'); });
+    }
+
+    try {
+      /* ── 進場：同一區塊內的元素依序出現 ── */
+      if (reduce || !('IntersectionObserver' in window)) {
+        revealAll();
+      } else {
+        document.querySelectorAll('section, header').forEach(function (sec) {
+          sec.querySelectorAll('[data-reveal]').forEach(function (el, i) {
+            el.style.transitionDelay = Math.min(i, 6) * 80 + 'ms';
+          });
+        });
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+          });
+        }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+        document.querySelectorAll('[data-reveal]').forEach(function (el) { io.observe(el); });
+      }
+
+      /* ── 首屏：選圈 → 找出同圈的人 ── */
+      var LIMIT = 3;
+      var SWIPE_MIN = 90; // 拖超過這個距離（px）才算滑走
+      var STAMP_TEXT = { like: '喜歡', nope: '略過', super: '超級喜歡' };
+      var PEOPLE = [
+        { id: 'siyu', name: '思妤', age: 29, km: '2.3', job: '品牌企劃', bio: '咖啡廳是我的第二個家。會手沖也會拉花，最近在練習烘豆。', circles: ['精品咖啡', '閱讀書友', '攝影同好', '旅行揪伴', '美食探店'] },
+        { id: 'mia', name: 'Mia', age: 30, km: '1.8', job: '健身教練', bio: '健身教練，相信流汗是最好的保養。喜歡重訓、拳擊和戶外慢跑。', circles: ['重訓健身', '瑜伽冥想', '美食探店', '旅行揪伴'] },
+        { id: 'zirui', name: '子睿', age: 35, km: '6.5', job: '攝影師', bio: '街拍攝影師，用底片記錄城市的光。喜歡老城區、霓虹燈和雨後的反光。', circles: ['攝影同好', '電影同好', '獨立音樂', '精品咖啡', '旅行揪伴', '創作者'] },
+        { id: 'caijie', name: '采潔', age: 28, km: '3.2', job: '美食編輯', bio: '美食編輯，吃遍台北是我的工作也是興趣。最懂巷弄裡的隱藏名單。', circles: ['美食探店', '品酒微醺', '旅行揪伴'] },
+        { id: 'ryan', name: 'Ryan', age: 33, km: '5.4', job: '遠端工作者', bio: '半個遊牧民族，去過 30 幾個國家。最愛海島和潛水，也愛爬山。', circles: ['旅行揪伴', '登山健行', '攝影同好', '美食探店'] }
+      ];
+      var picked = ['精品咖啡'];
+      var matches = [];
+      var current = 0;
+      var timer = null;
+      var paused = false;
+
+      var deck = document.getElementById('deck');
+      var chips = document.querySelectorAll('#chips .chip');
+      var countEl = document.getElementById('pick-count');
+      var resultEl = document.getElementById('pick-result');
+      var slotsEl = document.getElementById('cta-slots');
+      var noteEl = document.getElementById('pick-note');
+      var statusEl = document.getElementById('deck-status');
+      var stage = document.querySelector('.hero-stage');
+      var passBtn = document.getElementById('act-pass');
+      var likeBtn = document.getElementById('act-like');
+
+      function el(tag, cls, text) {
+        var n = document.createElement(tag);
+        if (cls) n.className = cls;
+        if (text != null) n.textContent = text;
+        return n;
+      }
+
+      // 建立六張卡（第一張沿用 HTML 裡的靜態卡，沒有 JS 時也看得到）
+      deck.innerHTML = '';
+      var cards = {};
+      PEOPLE.forEach(function (p) {
+        var card = el('article', 'pcard');
+        card.setAttribute('aria-hidden', 'true');
+        var img = el('img');
+        img.src = 'assets/people/' + p.id + '.jpg';
+        img.width = 720; img.height = 987;
+        img.alt = p.name + '的檔案照片（示意）';
+        var info = el('div', 'pcard-info');
+        var name = el('p', 'pcard-name', p.name);
+        name.appendChild(el('span', null, String(p.age)));
+        info.appendChild(name);
+        info.appendChild(el('p', 'pcard-meta', p.km + ' km ・ 台北 ・ ' + p.job));
+        info.appendChild(el('p', 'pcard-bio', p.bio));
+        var tags = el('p', 'pcard-tags');
+        info.appendChild(tags);
+        card.appendChild(img);
+        card.appendChild(info);
+        addStamps(card);
+        deck.appendChild(card);
+        cards[p.id] = { card: card, tags: tags };
+      });
+      var empty = el('div', 'pcard pcard-empty');
+      empty.appendChild(el('p', null, '選一個圈，看看誰也在裡面'));
+      deck.appendChild(empty);
+
+      function overlap(p) {
+        return p.circles.filter(function (c) { return picked.indexOf(c) !== -1; });
+      }
+
+      function renderTags(p) {
+        var t = cards[p.id].tags;
+        t.innerHTML = '';
+        var shared = overlap(p);
+        if (shared.length) t.appendChild(el('span', 'shared', '共同圈 ・ ' + shared.slice(0, 2).join('、')));
+        p.circles.filter(function (c) { return shared.indexOf(c) === -1; }).slice(0, shared.length > 1 ? 1 : 2)
+          .forEach(function (c) { t.appendChild(el('span', null, c)); });
+      }
+
+      // 目前這張在最上面，下一位疊在後面，剛滑走的往左飛出
+      function show(i) {
+        current = i;
+        var on = matches.length ? matches[i] : null;
+        var next = matches.length > 1 ? matches[(i + 1) % matches.length] : null;
+        Object.keys(cards).forEach(function (id) {
+          var c = cards[id].card;
+          var wasOn = c.classList.contains('is-on');
+          c.classList.remove('is-on', 'is-next', 'is-out');
+          if (on && id === on.id) c.classList.add('is-on');
+          else if (next && id === next.id) c.classList.add('is-next');
+          else if (wasOn) c.classList.add('is-out');
+          c.setAttribute('aria-hidden', on && id === on.id ? 'false' : 'true');
+        });
+        empty.classList.toggle('is-on', !on);
+        if (!on) { statusEl.textContent = '還沒選交友圈'; return; }
+        statusEl.textContent = '現在顯示' + on.name + '，共同圈：' + overlap(on).join('、');
+      }
+
+      function renderResult() {
+        resultEl.textContent = '';
+        if (!picked.length) { resultEl.textContent = '先選一個圈。'; return; }
+        resultEl.appendChild(document.createTextNode('和你同圈 ' + matches.length + ' 位：'));
+        resultEl.appendChild(el('b', null, matches.map(function (p) { return p.name; }).join('、')));
+      }
+
+      // 結尾那段的三個圈：帶入首屏挑的圈，空位可以點回去挑
+      function renderSlots() {
+        slotsEl.innerHTML = '';
+        for (var i = 0; i < LIMIT; i++) {
+          if (picked[i]) {
+            slotsEl.appendChild(el('span', 'slot is-filled', picked[i]));
+          } else {
+            var a = el('a', 'slot', '再挑一個');
+            a.href = '#picker';
+            slotsEl.appendChild(a);
+          }
+        }
+      }
+
+      function update() {
+        matches = PEOPLE.filter(function (p) { return overlap(p).length > 0; })
+          .sort(function (a, b) { return overlap(b).length - overlap(a).length; });
+        PEOPLE.forEach(renderTags);
+        countEl.textContent = picked.length;
+        renderResult();
+        renderSlots();
+        show(0);
+        restart();
+      }
+
+      /* ── 滑卡：拖曳卡片，往左略過、往右喜歡、往上超級喜歡（首屏與探索共用） ── */
+      function addStamps(card) {
+        Object.keys(STAMP_TEXT).forEach(function (k) {
+          var s = el('span', 'stamp ' + k, STAMP_TEXT[k]);
+          s.setAttribute('aria-hidden', 'true');
+          card.appendChild(s);
+        });
+      }
+
+      // 依拖曳方向與距離，淡入對應的印章
+      function setStamps(card, dx, dy) {
+        var up = dy < 0 && Math.abs(dy) > Math.abs(dx);
+        var op = {
+          like: !up && dx > 0 ? Math.min(dx / SWIPE_MIN, 1) : 0,
+          nope: !up && dx < 0 ? Math.min(-dx / SWIPE_MIN, 1) : 0,
+          super: up ? Math.min(-dy / SWIPE_MIN, 1) : 0
+        };
+        Object.keys(op).forEach(function (k) {
+          var s = card.querySelector('.stamp.' + k);
+          if (!s) return;
+          s.style.opacity = op[k];
+          s.style.visibility = op[k] > 0 ? 'visible' : 'hidden';
+        });
+      }
+
+      function fly(card, dir, done) {
+        card.dataset.flying = '1';
+        var to = dir === 'right' ? 'translate(140%, 6%) rotate(22deg)'
+          : dir === 'left' ? 'translate(-140%, 6%) rotate(-22deg)'
+          : 'translate(0, -130%)';
+        setStamps(card, dir === 'right' ? SWIPE_MIN : dir === 'left' ? -SWIPE_MIN : 0, dir === 'up' ? -SWIPE_MIN : 0);
+        card.style.transition = reduce ? 'none' : 'transform .38s cubic-bezier(.3,.6,.4,1), opacity .38s ease';
+        card.style.transform = to;
+        card.style.opacity = '0';
+        setTimeout(function () { done(dir, card); }, reduce ? 0 : 360);
+      }
+
+      function snapBack(card) {
+        card.style.transition = reduce ? 'none' : 'transform .3s cubic-bezier(.22,.7,.3,1)';
+        card.style.transform = '';
+        setStamps(card, 0, 0);
+        setTimeout(function () { card.style.transition = ''; }, 320);
+      }
+
+      // 綁定拖曳與方向鍵；getTop 回傳目前最上面那張卡
+      function makeSwipe(area, getTop, onSwipe, onStart, onEnd) {
+        var drag = null;
+        area.addEventListener('pointerdown', function (e) {
+          var card = getTop();
+          if (!card || !card.contains(e.target) || e.button > 0) return;
+          drag = { card: card, id: e.pointerId, x: e.clientX, y: e.clientY, dx: 0, dy: 0 };
+          try { card.setPointerCapture(e.pointerId); } catch (err) { /* 少數瀏覽器拿不到 pointer 時，照樣用冒泡的事件拖曳 */ }
+          card.classList.add('dragging');
+          if (onStart) onStart();
+        });
+        area.addEventListener('pointermove', function (e) {
+          if (!drag || e.pointerId !== drag.id) return;
+          drag.dx = e.clientX - drag.x;
+          drag.dy = e.clientY - drag.y;
+          drag.card.style.transform = 'translate(' + drag.dx + 'px,' + drag.dy + 'px) rotate(' + (drag.dx * 0.05) + 'deg)';
+          setStamps(drag.card, drag.dx, drag.dy);
+        });
+        function end(e) {
+          if (!drag || e.pointerId !== drag.id) return;
+          var d = drag;
+          drag = null;
+          d.card.classList.remove('dragging');
+          var up = d.dy < -SWIPE_MIN && Math.abs(d.dy) > Math.abs(d.dx);
+          var dir = up ? 'up' : d.dx > SWIPE_MIN ? 'right' : d.dx < -SWIPE_MIN ? 'left' : null;
+          if (dir) onSwipe(dir, d.card); else snapBack(d.card);
+          if (onEnd) onEnd(e);
+        }
+        area.addEventListener('pointerup', end);
+        area.addEventListener('pointercancel', end);
+        area.addEventListener('keydown', function (e) {
+          var dir = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up' }[e.key];
+          var card = dir && getTop();
+          if (!card) return;
+          e.preventDefault();
+          onSwipe(dir, card);
+        });
+      }
+
+      function popLike(btn) {
+        btn.classList.remove('pop');
+        void btn.offsetWidth;
+        btn.classList.add('pop');
+      }
+
+      // 首屏：滑走後換同圈的下一位
+      function heroTop() {
+        return deck.querySelector('.pcard.is-on:not(.pcard-empty):not([data-flying])');
+      }
+      function heroSwipe(dir, card) {
+        if (matches.length < 2) {
+          snapBack(card);
+          noteEl.textContent = '這幾個圈裡只有 1 位，多選一個圈看看。';
+          return;
+        }
+        if (dir === 'right') popLike(likeBtn);
+        fly(card, dir, function () {
+          show((current + 1) % matches.length);
+          card.style.transition = '';
+          card.style.transform = '';
+          card.style.opacity = '';
+          setStamps(card, 0, 0);
+          delete card.dataset.flying;
+          restart();
+        });
+      }
+      makeSwipe(deck, heroTop, heroSwipe, function () { paused = true; }, function (e) { if (e.pointerType !== 'mouse') paused = false; });
+
+      // 沒有卡片可滑時（還沒選圈）按鈕只顯示提示
+      function advance(dir) {
+        var card = heroTop();
+        if (card) { heroSwipe(dir, card); return; }
+        noteEl.textContent = matches.length ? '' : '先選一個圈，看看誰也在裡面。';
+      }
+      passBtn.addEventListener('click', function () { advance('left'); });
+      likeBtn.addEventListener('click', function () { advance('right'); });
+
+      function restart() {
+        if (timer) clearInterval(timer);
+        timer = null;
+        if (reduce || matches.length < 2) return;
+        timer = setInterval(function () {
+          if (paused || document.hidden) return;
+          show((current + 1) % matches.length);
+        }, 5600);
+      }
+
+      chips.forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          var c = chip.getAttribute('data-c');
+          var at = picked.indexOf(c);
+          if (at !== -1) {
+            picked.splice(at, 1);
+            chip.setAttribute('aria-pressed', 'false');
+            noteEl.textContent = '';
+          } else if (picked.length >= LIMIT) {
+            noteEl.textContent = '免費版最多加入 3 個圈，VIP 可以加入 8 個。';
+            return;
+          } else {
+            picked.push(c);
+            chip.setAttribute('aria-pressed', 'true');
+            noteEl.textContent = '';
+          }
+          update();
+        });
+      });
+      stage.addEventListener('mouseenter', function () { paused = true; });
+      stage.addEventListener('mouseleave', function () { paused = false; });
+      stage.addEventListener('focusin', function () { paused = true; });
+      stage.addEventListener('focusout', function () { paused = false; });
+      update();
+
+      /* ── 探索分頁：可以一直滑下去的卡片堆 ── */
+      var EX = [
+        { id: 'caijie', shared: '美食探店', other: '品酒微醺' },
+        { id: 'siyu', shared: '精品咖啡', other: '閱讀書友' },
+        { id: 'mia', shared: '重訓健身', other: '瑜伽冥想' },
+        { id: 'zirui', shared: '攝影同好', other: '獨立音樂' },
+        { id: 'ryan', shared: '旅行揪伴', other: '登山健行' }
+      ];
+      var exDeck = document.getElementById('ex-deck');
+      var exStatus = document.getElementById('ex-status');
+      var exUndo = document.getElementById('ex-undo');
+      var exLike = document.getElementById('ex-like');
+      var exSuperBtn = document.getElementById('ex-super');
+      var exSuperN = document.getElementById('ex-super-n');
+      var exIdx = 0;
+      var exLog = [];
+      var superLeft = 15;
+
+      function exPerson(i) {
+        var e = EX[((i % EX.length) + EX.length) % EX.length];
+        return { e: e, p: PEOPLE.filter(function (x) { return x.id === e.id; })[0] };
+      }
+      function exCard(i, under) {
+        var d = exPerson(i);
+        var card = el('article', 's-card ui-card ' + (under ? 'is-under' : 'is-top'));
+        if (under) card.setAttribute('aria-hidden', 'true');
+        var img = el('img');
+        img.src = 'assets/people/' + d.p.id + '.jpg';
+        img.width = 720; img.height = 987;
+        img.alt = d.p.name + '的檔案照片（示意）';
+        img.draggable = false;
+        var info = el('div', 'pcard-info');
+        var name = el('p', 'pcard-name', d.p.name);
+        name.appendChild(el('span', null, String(d.p.age)));
+        info.appendChild(name);
+        info.appendChild(el('p', 'pcard-meta', d.p.km + ' km ・ 台北 ・ ' + d.p.job));
+        info.appendChild(el('p', 'pcard-bio', d.p.bio));
+        var tags = el('p', 'pcard-tags');
+        tags.appendChild(el('span', 'shared', '共同圈 ・ ' + d.e.shared));
+        tags.appendChild(el('span', null, d.e.other));
+        info.appendChild(tags);
+        card.appendChild(img);
+        card.appendChild(info);
+        addStamps(card);
+        return card;
+      }
+      function exRender() {
+        exDeck.innerHTML = '';
+        exDeck.appendChild(exCard(exIdx + 1, true));
+        exDeck.appendChild(exCard(exIdx, false));
+        exUndo.disabled = exLog.length === 0;
+      }
+      function exTop() {
+        return exDeck.querySelector('.s-card.is-top:not([data-flying])');
+      }
+      function exSwipe(dir, card) {
+        if (dir === 'up' && superLeft === 0) {
+          snapBack(card);
+          exStatus.textContent = '這個月的超級喜歡用完了';
+          return;
+        }
+        if (dir === 'right') popLike(exLike);
+        var name = exPerson(exIdx).p.name;
+        fly(card, dir, function () {
+          exLog.push(exIdx);
+          exIdx++;
+          if (dir === 'up') {
+            superLeft--;
+            exSuperN.textContent = superLeft;
+            exSuperBtn.setAttribute('aria-label', '超級喜歡，剩 ' + superLeft + ' 次');
+          }
+          card.remove();
+          // 後面那張補上來，再墊一張新的在最底下
+          var next = exDeck.querySelector('.s-card.is-under');
+          if (next) {
+            next.classList.remove('is-under');
+            next.classList.add('is-top');
+            next.removeAttribute('aria-hidden');
+          }
+          exDeck.insertBefore(exCard(exIdx + 1, true), exDeck.firstChild);
+          exUndo.disabled = false;
+          exStatus.textContent = (dir === 'right' ? '喜歡了' : dir === 'left' ? '略過了' : '超級喜歡了') + name;
+        });
+      }
+      makeSwipe(exDeck, exTop, exSwipe);
+      document.getElementById('ex-pass').addEventListener('click', function () { var c = exTop(); if (c) exSwipe('left', c); });
+      exLike.addEventListener('click', function () { var c = exTop(); if (c) exSwipe('right', c); });
+      exSuperBtn.addEventListener('click', function () { var c = exTop(); if (c) exSwipe('up', c); });
+      exUndo.addEventListener('click', function () {
+        if (!exLog.length) return;
+        exIdx = exLog.pop();
+        exRender();
+        exStatus.textContent = '回到' + exPerson(exIdx).p.name;
+      });
+      exRender();
+
+      /* ── App 畫面索引 ── */
+      var tabs = Array.prototype.slice.call(document.querySelectorAll('.show-names [role="tab"]'));
+      function selectTab(tab, focus) {
+        var k = tab.getAttribute('data-k');
+        tabs.forEach(function (t) {
+          var on = t === tab;
+          t.setAttribute('aria-selected', on ? 'true' : 'false');
+          t.tabIndex = on ? 0 : -1;
+        });
+        document.querySelectorAll('.shot, .show-texts p').forEach(function (n) {
+          n.classList.toggle('is-on', n.getAttribute('data-k') === k);
+        });
+        if (focus) tab.focus();
+      }
+      tabs.forEach(function (tab, i) {
+        tab.addEventListener('click', function () { selectTab(tab); });
+        tab.addEventListener('keydown', function (e) {
+          var d = (e.key === 'ArrowRight' || e.key === 'ArrowDown') ? 1 : (e.key === 'ArrowLeft' || e.key === 'ArrowUp') ? -1 : 0;
+          if (!d) return;
+          e.preventDefault();
+          selectTab(tabs[(i + d + tabs.length) % tabs.length], true);
+        });
+      });
+
+      // 自動輪播：選中分頁的小圈畫滿（6 秒）就換下一頁；滑鼠停在上面、鍵盤操作或手指剛碰過時暫停
+      var namesEl = document.querySelector('.show-names');
+      var showZones = [document.querySelector('.show-index'), document.querySelector('.show-stage')];
+      var hovering = 0;
+      var keyFocus = false;
+      var touchUntil = 0;
+      var TOUCH_HOLD = 8000;
+      function syncPause() {
+        namesEl.classList.toggle('is-paused', hovering > 0 || keyFocus || Date.now() < touchUntil);
+      }
+      showZones.forEach(function (z) {
+        z.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') { hovering++; syncPause(); } });
+        z.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') { hovering = Math.max(0, hovering - 1); syncPause(); } });
+        z.addEventListener('pointerdown', function (e) {
+          if (e.pointerType === 'mouse') return;
+          touchUntil = Date.now() + TOUCH_HOLD;
+          syncPause();
+          setTimeout(syncPause, TOUCH_HOLD + 50);
+        });
+        z.addEventListener('focusin', function (e) { keyFocus = e.target.matches(':focus-visible'); syncPause(); });
+        z.addEventListener('focusout', function () { keyFocus = false; syncPause(); });
+      });
+      namesEl.addEventListener('animationend', function (e) {
+        if (e.animationName !== 'ring-fill') return;
+        var cur = tabs.filter(function (t) { return t.getAttribute('aria-selected') === 'true'; })[0];
+        selectTab(tabs[(tabs.indexOf(cur) + 1) % tabs.length]);
+      });
+      // 這段在畫面上才播，捲走就停；減少動態效果的人不自動播
+      if (!reduce && 'IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) { namesEl.classList.toggle('is-playing', en.isIntersecting); });
+        }, { threshold: 0.35 }).observe(document.getElementById('how'));
+      }
+
+      /* ── 方案 ── */
+      var planBtns = document.querySelectorAll('.plan-name');
+      function selectPlan(btn) {
+        planBtns.forEach(function (b) {
+          var on = b === btn;
+          b.setAttribute('aria-expanded', on ? 'true' : 'false');
+          document.getElementById(b.getAttribute('aria-controls')).classList.toggle('is-on', on);
+        });
+      }
+      planBtns.forEach(function (b) {
+        b.addEventListener('click', function () { selectPlan(b); });
+        b.addEventListener('focus', function () { if (window.matchMedia('(min-width: 901px)').matches) selectPlan(b); });
+      });
+    } catch (err) {
+      revealAll();
+      root.classList.remove('js');
+    }
+  })();
+  </script>
 </body>
 </html>
