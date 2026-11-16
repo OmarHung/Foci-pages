@@ -1,0 +1,5 @@
+# 上線前不讓搜尋引擎收錄（2026-11-16 起）。
+# 不用 robots.txt 擋：被 Disallow 的頁面爬蟲讀不到 noindex，有外部連結時網址仍可能被收錄。
+# App 上架、要開放收錄時刪掉下面這段，再做 SEO（sitemap、canonical、Search Console）。
+/*
+  X-Robots-Tag: noindex, nofollow
