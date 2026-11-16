@@ -20,8 +20,8 @@ const GROUPS = [
   { key: 'region', title: '地區圈' },
   { key: 'gate', title: '有加入條件' },
 ];
-// 三欄高度盡量接近：興趣｜身份｜地區＋有加入條件
-const COLUMNS = [['interest'], ['identity'], ['region', 'gate']];
+// 四個分類並排，一欄一類
+const COLUMNS = [['interest'], ['identity'], ['region'], ['gate']];
 const GENDER_LABEL = { female: '女性', male: '男性', other: '其他' };
 
 function escapeHtml(text) {
