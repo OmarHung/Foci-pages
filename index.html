@@ -205,6 +205,15 @@
     .rows .ring.gate { border-color: var(--gold); }
     .rows .name { font-size: var(--step-body); }
     .rows .val { margin-left: auto; padding-left: 12px; font-size: var(--step-small); color: var(--muted); text-align: right; }
+    /* 超過預覽數量的圈子收在 details 裡：點擊展開，避免圈子變多時版面跑掉 */
+    .rows-more { margin-top: 8px; }
+    .rows-more summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; min-height: 40px; font-size: var(--step-small); color: var(--accent); font-weight: 600; }
+    .rows-more summary::-webkit-details-marker { display: none; }
+    .rows-more summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
+    .rows-more summary .t-less { display: none; }
+    .rows-more[open] summary .t-more { display: none; }
+    .rows-more[open] summary .t-less { display: inline; }
+    .rows-more .rows { margin-top: 4px; }
 
     /* ── 畫面索引（showcase） ── */
     .show { padding-block: 0 var(--section); }
@@ -584,7 +593,7 @@
               <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M16.37 12.6c-.02-2.2 1.8-3.26 1.88-3.31-1.02-1.5-2.62-1.7-3.19-1.72-1.36-.14-2.65.8-3.34.8-.69 0-1.75-.78-2.88-.76-1.48.02-2.85.86-3.61 2.19-1.54 2.67-.39 6.62 1.11 8.79.73 1.06 1.6 2.25 2.75 2.2 1.1-.04 1.52-.71 2.85-.71 1.33 0 1.71.71 2.88.69 1.19-.02 1.94-1.08 2.66-2.14.84-1.23 1.19-2.42 1.21-2.48-.03-.01-2.31-.89-2.32-3.55zM14.18 6.13c.61-.74 1.02-1.76.91-2.78-.88.04-1.94.59-2.57 1.32-.56.65-1.06 1.69-.93 2.69.98.08 1.98-.5 2.59-1.23z"/></svg>
               App Store 即將上架
             </span>
-            <a class="text-link" href="#circles">看全部 30 個圈</a>
+            <a class="text-link" href="#circles">看全部 34 個圈</a>
           </div>
         </div>
 
@@ -637,59 +646,77 @@
     <!-- ── 交友圈清單 ── -->
     <section class="circles" id="circles" aria-labelledby="circles-title">
       <div class="grid">
+        <!-- circles:start -->
         <div class="circles-head" data-reveal>
-          <h2 id="circles-title">目前開放的 30 個交友圈</h2>
+          <h2 id="circles-title">目前開放的 34 個交友圈</h2>
           <p>興趣、身份、地區三類，另有 3 個設了加入條件的圈。免費版可以同時加入 3 個，VIP 8 個，VIP+ 不限。</p>
           <a class="text-link" href="#plans">比較三種方案</a>
         </div>
 
         <div class="circle-col" data-reveal>
-          <h3>興趣圈<small>14 個</small></h3>
+        <h3>興趣圈<small>18 個</small></h3>
           <ul class="rows">
-            <li><span class="ring"></span><span class="name">登山健行</span><span class="val">郊山到百岳</span></li>
-            <li><span class="ring"></span><span class="name">精品咖啡</span><span class="val">手沖、跑店</span></li>
-            <li><span class="ring"></span><span class="name">攝影同好</span><span class="val">底片、街拍</span></li>
-            <li><span class="ring"></span><span class="name">獨立音樂</span><span class="val">Live House</span></li>
-            <li><span class="ring"></span><span class="name">桌遊愛好</span><span class="val">揪團開桌</span></li>
-            <li><span class="ring"></span><span class="name">重訓健身</span><span class="val">課表交流</span></li>
-            <li><span class="ring"></span><span class="name">貓奴集合</span><span class="val">曬貓、養貓</span></li>
-            <li><span class="ring"></span><span class="name">狗派日常</span><span class="val">寵物友善景點</span></li>
-            <li><span class="ring"></span><span class="name">美食探店</span><span class="val">揪飯局</span></li>
-            <li><span class="ring"></span><span class="name">旅行揪伴</span><span class="val">揪伴同遊</span></li>
-            <li><span class="ring"></span><span class="name">電影同好</span><span class="val">院線、影展</span></li>
-            <li><span class="ring"></span><span class="name">閱讀書友</span><span class="val">選書、讀書會</span></li>
-            <li><span class="ring"></span><span class="name">瑜伽冥想</span><span class="val">身心平衡</span></li>
-            <li><span class="ring"></span><span class="name">品酒微醺</span><span class="val">紅白酒、威士忌</span></li>
+            <li><span class="ring"></span><span class="name">匹克球</span></li>
+            <li><span class="ring"></span><span class="name">狗派日常</span></li>
+            <li><span class="ring"></span><span class="name">品酒微醺</span></li>
+            <li><span class="ring"></span><span class="name">美食探店</span></li>
+            <li><span class="ring"></span><span class="name">重訓健身</span></li>
+            <li><span class="ring"></span><span class="name">旅行揪伴</span></li>
           </ul>
+          <details class="rows-more">
+            <summary><span class="t-more">看另外 12 個</span><span class="t-less">收起</span></summary>
+            <ul class="rows">
+              <li><span class="ring"></span><span class="name">桌遊愛好</span></li>
+              <li><span class="ring"></span><span class="name">單車騎行</span></li>
+              <li><span class="ring"></span><span class="name">登山健行</span></li>
+              <li><span class="ring"></span><span class="name">瑜伽冥想</span></li>
+              <li><span class="ring"></span><span class="name">路跑馬拉松</span></li>
+              <li><span class="ring"></span><span class="name">電影同好</span></li>
+              <li><span class="ring"></span><span class="name">精品咖啡</span></li>
+              <li><span class="ring"></span><span class="name">網球同好</span></li>
+              <li><span class="ring"></span><span class="name">閱讀書友</span></li>
+              <li><span class="ring"></span><span class="name">獨立音樂</span></li>
+              <li><span class="ring"></span><span class="name">貓奴集合</span></li>
+              <li><span class="ring"></span><span class="name">攝影同好</span></li>
+            </ul>
+          </details>
         </div>
 
         <div class="circle-col" data-reveal>
-          <h3>身份圈<small>8 個</small></h3>
+        <h3>身份圈<small>8 個</small></h3>
           <ul class="rows">
-            <li><span class="ring"></span><span class="name">軟體工程師</span><span class="val">上班寫程式的人</span></li>
-            <li><span class="ring"></span><span class="name">醫護人員</span><span class="val">懂你的班表</span></li>
-            <li><span class="ring"></span><span class="name">設計師圈</span><span class="val">UI/UX、平面、產品</span></li>
-            <li><span class="ring"></span><span class="name">新創圈</span><span class="val">早期團隊</span></li>
-            <li><span class="ring"></span><span class="name">金融業</span><span class="val">銀行、投資、保險</span></li>
-            <li><span class="ring"></span><span class="name">教師圈</span><span class="val">各級教師</span></li>
-            <li><span class="ring"></span><span class="name">留學海歸</span><span class="val">待過異鄉的人</span></li>
-            <li><span class="ring"></span><span class="name">創作者</span><span class="val">接案、自由業</span></li>
+            <li><span class="ring"></span><span class="name">金融業</span></li>
+            <li><span class="ring"></span><span class="name">留學海歸</span></li>
+            <li><span class="ring"></span><span class="name">教師圈</span></li>
+            <li><span class="ring"></span><span class="name">設計師圈</span></li>
+            <li><span class="ring"></span><span class="name">軟體工程師</span></li>
+            <li><span class="ring"></span><span class="name">創作者</span></li>
           </ul>
-          <h3>地區圈<small>5 個</small></h3>
+          <details class="rows-more">
+            <summary><span class="t-more">看另外 2 個</span><span class="t-less">收起</span></summary>
+            <ul class="rows">
+              <li><span class="ring"></span><span class="name">新創圈</span></li>
+              <li><span class="ring"></span><span class="name">醫護人員</span></li>
+            </ul>
+          </details>
+
+        <h3>地區圈<small>5 個</small></h3>
           <ul class="rows">
-            <li><span class="ring region"></span><span class="name">台北信義</span><span class="val">101 到吳興街</span></li>
-            <li><span class="ring region"></span><span class="name">台北大安</span><span class="val">師大、公園一帶</span></li>
-            <li><span class="ring region"></span><span class="name">新竹竹科</span><span class="val">竹科生活圈</span></li>
-            <li><span class="ring region"></span><span class="name">台中西屯</span><span class="val">七期、逢甲</span></li>
-            <li><span class="ring region"></span><span class="name">高雄生活圈</span><span class="val">駁二到鹽埕</span></li>
+            <li><span class="ring region"></span><span class="name">台中西屯</span></li>
+            <li><span class="ring region"></span><span class="name">台北大安</span></li>
+            <li><span class="ring region"></span><span class="name">台北信義</span></li>
+            <li><span class="ring region"></span><span class="name">高雄生活圈</span></li>
+            <li><span class="ring region"></span><span class="name">新竹竹科</span></li>
           </ul>
-          <h3>有加入條件<small>3 個</small></h3>
+
+        <h3>有加入條件<small>3 個</small></h3>
           <ul class="rows">
             <li><span class="ring gate"></span><span class="name">女性安心圈</span><span class="val">限女性</span></li>
-            <li><span class="ring gate"></span><span class="name">熟齡交友 40+</span><span class="val">40 歲以上</span></li>
             <li><span class="ring gate"></span><span class="name">青年交友 18–28</span><span class="val">18 到 28 歲</span></li>
+            <li><span class="ring gate"></span><span class="name">熟齡交友 40+</span><span class="val">40 歲以上</span></li>
           </ul>
         </div>
+            <!-- circles:end -->
       </div>
     </section>
 
