@@ -1220,8 +1220,9 @@
       }
 
       function update() {
+        // 年齡小的排前面；同齡再比共同圈數量，最後才照 PEOPLE 的順序（sort 是穩定排序）
         matches = PEOPLE.filter(function (p) { return overlap(p).length > 0; })
-          .sort(function (a, b) { return overlap(b).length - overlap(a).length; });
+          .sort(function (a, b) { return a.age - b.age || overlap(b).length - overlap(a).length; });
         PEOPLE.forEach(renderTags);
         countEl.textContent = picked.length;
         renderResult();
