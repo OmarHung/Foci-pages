@@ -454,7 +454,7 @@
     .cta-main { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; text-align: center; }
     .cta h2 { font-size: var(--step-display); line-height: 1.12; }
     .cta h2 span { display: block; }
-    /* 三個圈的位置：首屏挑過的圈會帶進來，空的位置可以回去挑 */
+    /* 圈的位置：首屏挑過的圈會帶進來，不足三個時空的位置可以回去挑 */
     .cta-slots { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 32px; }
     .slot {
       display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: 999px;
@@ -593,8 +593,8 @@
         <div class="hero-picker" id="picker">
           <div class="picker" data-ui data-reveal>
             <div class="picker-head">
-              <p id="picker-title">選你在意的圈，最多 3 個</p>
-              <p class="picker-count"><span id="pick-count">1</span>/3（免費）</p>
+              <p id="picker-title">選你在意的圈，可以多選</p>
+              <p class="picker-count">已選 <span id="pick-count">1</span> 個</p>
             </div>
             <div class="chips" role="group" aria-labelledby="picker-title" id="chips">
               <button class="chip" type="button" aria-pressed="false" data-c="登山健行"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>登山健行</button>
@@ -1037,7 +1037,7 @@
     <section class="cta" id="download" aria-labelledby="cta-title">
       <div class="grid">
         <div class="cta-main">
-          <h2 id="cta-title" data-reveal><span>先挑三個圈，</span><span>其他交給緣分</span></h2>
+          <h2 id="cta-title" data-reveal><span>先挑你在意的圈，</span><span>其他交給緣分</span></h2>
           <div class="cta-slots" id="cta-slots" data-reveal aria-label="你挑的交友圈">
             <span class="slot is-filled">精品咖啡</span>
             <a class="slot" href="#picker">再挑一個</a>
@@ -1091,7 +1091,7 @@
       }
 
       /* ── 首屏：選圈 → 找出同圈的人 ── */
-      var LIMIT = 3;
+      var MIN_SLOTS = 3; // 結尾那段至少顯示幾個位置（不足的用「再挑一個」補）
       var SWIPE_MIN = 90; // 拖超過這個距離（px）才算滑走
       var STAMP_TEXT = { like: '喜歡', nope: '略過', super: '超級喜歡' };
       var PEOPLE = [
@@ -1099,7 +1099,8 @@
         { id: 'mia', name: 'Mia', age: 30, km: '1.8', job: '健身教練', bio: '健身教練，相信流汗是最好的保養。喜歡重訓、拳擊和戶外慢跑。', circles: ['重訓健身', '瑜伽冥想', '美食探店', '旅行揪伴'] },
         { id: 'zirui', name: '子睿', age: 35, km: '6.5', job: '攝影師', bio: '街拍攝影師，用底片記錄城市的光。喜歡老城區、霓虹燈和雨後的反光。', circles: ['攝影同好', '電影同好', '獨立音樂', '精品咖啡', '旅行揪伴', '創作者'] },
         { id: 'caijie', name: '采潔', age: 28, km: '3.2', job: '美食編輯', bio: '美食編輯，吃遍台北是我的工作也是興趣。最懂巷弄裡的隱藏名單。', circles: ['美食探店', '品酒微醺', '旅行揪伴'] },
-        { id: 'ryan', name: 'Ryan', age: 33, km: '5.4', job: '遠端工作者', bio: '半個遊牧民族，去過 30 幾個國家。最愛海島和潛水，也愛爬山。', circles: ['旅行揪伴', '登山健行', '攝影同好', '美食探店'] }
+        { id: 'ryan', name: 'Ryan', age: 33, km: '5.4', job: '遠端工作者', bio: '半個遊牧民族，去過 30 幾個國家。最愛海島和潛水，也愛爬山。', circles: ['旅行揪伴', '登山健行', '攝影同好', '美食探店'] },
+        { id: 'weixiang', name: '偉翔', age: 32, km: '2.7', job: '軟體工程師', bio: '假日一定往山上跑的工程師。爬過 27 座百岳，背包裡永遠塞著一台相機。', circles: ['登山健行', '攝影同好', '旅行揪伴', '精品咖啡'] }
       ];
       var picked = ['精品咖啡'];
       var matches = [];
@@ -1192,10 +1193,10 @@
         resultEl.appendChild(el('b', null, matches.map(function (p) { return p.name; }).join('、')));
       }
 
-      // 結尾那段的三個圈：帶入首屏挑的圈，空位可以點回去挑
+      // 結尾那段的圈：帶入首屏挑的圈（全部），不足 MIN_SLOTS 個的空位可以點回去挑
       function renderSlots() {
         slotsEl.innerHTML = '';
-        for (var i = 0; i < LIMIT; i++) {
+        for (var i = 0; i < Math.max(MIN_SLOTS, picked.length); i++) {
           if (picked[i]) {
             slotsEl.appendChild(el('span', 'slot is-filled', picked[i]));
           } else {
@@ -1356,9 +1357,6 @@
             picked.splice(at, 1);
             chip.setAttribute('aria-pressed', 'false');
             noteEl.textContent = '';
-          } else if (picked.length >= LIMIT) {
-            noteEl.textContent = '免費版最多加入 3 個圈，VIP 可以加入 8 個。';
-            return;
           } else {
             picked.push(c);
             chip.setAttribute('aria-pressed', 'true');
