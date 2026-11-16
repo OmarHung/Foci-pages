@@ -347,15 +347,14 @@
     .cell-text { padding: 28px 28px 24px; }
     .cell h3 { font-size: var(--step-lead); line-height: 1.35; }
     .cell p { margin-top: 10px; font-size: var(--step-body); line-height: 1.65; }
-    .cell .frag { margin-top: auto; }
-    .cell.frag-top { flex-direction: column-reverse; }
-    .cell.frag-top .frag { margin-top: 0; margin-bottom: auto; }
+    .cell .frag { margin-top: auto; } /* 文字固定在上方，示範畫面貼著卡片下緣 */
 
     /* 片段共用（App 介面） */
     .frag { font-family: var(--sans); color: var(--ink); }
     .frag-panel { background: #fff; padding: 18px; }
-    .cell:not(.frag-top) .frag-panel { margin: 0 28px; border-radius: 18px 18px 0 0; }
-    .cell.frag-top .frag-panel { margin: 0 28px; border-radius: 0 0 18px 18px; }
+    /* 示範畫面浮在卡片下方，四邊留白一致（貼底會有被裁切的感覺）。
+       用三個類別選擇器：蓋得過 .cell .frag 的 margin-top，自己帶 auto 貼到下緣；手機版的規則在 @media 裡再蓋 */
+    .cell-grid .cell .frag-panel { margin: auto 28px 28px; border-radius: 18px; }
     .m-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; }
     .m-row + .m-row { border-top: 1px solid rgba(42,36,34,.06); } /* taste-skill-ignore：App 列表分隔線 */
     .m-row img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex: none; }
@@ -379,7 +378,7 @@
     .otp span.caret::after { content: ""; width: 2px; height: 24px; background: var(--accent); animation: blink 1.1s steps(1) infinite; }
     @keyframes blink { 50% { opacity: 0; } }
     .otp-sent { margin-top: 12px; font-size: 13px; color: var(--muted); }
-    .alert { margin: 0 28px; background: rgba(245,242,239,.98); border-radius: 0 0 16px 16px; text-align: center; }
+    .alert { margin: 0 28px 28px; background: rgba(245,242,239,.98); border-radius: 16px; text-align: center; } /* 對話框跟動作選單一樣浮在卡片上 */
     .alert-body { padding: 18px 18px 14px; }
     .alert-title { font-weight: 700; font-size: 15px; line-height: 1.35; }
     .alert-msg { margin-top: 6px; font-size: 13px; line-height: 1.5; }
@@ -511,8 +510,7 @@
       .show-stage { margin-top: 36px; }
       .cell-grid { grid-template-columns: minmax(0, 1fr); gap: 6px; }
       .cell { min-height: 0; }
-      .cell.frag-top { flex-direction: column; }
-      .cell.frag-top .frag { margin: 0; }
+      .cell-grid .cell .frag-panel { margin: 0 28px; border-radius: 18px 18px 0 0; } /* 手機版維持貼底，奇數格兩側留白 */
       .cell .frag-panel, .cell .alert, .cell .sheet { margin: 0 0 0 20px; border-radius: 18px 0 0 0; }
       .cell:nth-child(even) .frag-panel, .cell:nth-child(even) .alert, .cell:nth-child(even) .sheet { margin: 0 20px 0 0; border-radius: 0 18px 0 0; }
       .cell .sheet { padding-bottom: 20px; }
@@ -874,7 +872,7 @@
             </div>
           </article>
 
-          <article class="cell frag-top" data-reveal>
+          <article class="cell" data-reveal>
             <div class="cell-text">
               <h3>破冰問句就在輸入框上方</h3>
               <p>不知道怎麼開口的時候，點一下問句就送出。之後要聊什麼，交給你們自己。</p>
@@ -904,7 +902,7 @@
             </div>
           </article>
 
-          <article class="cell frag-top" data-reveal>
+          <article class="cell" data-reveal>
             <div class="cell-text">
               <h3>位置只在你按下時讀一次</h3>
               <p>Foci 用位置計算距離、推薦附近的人。只有你主動取得位置時才讀一次座標，不會在背景持續追蹤。</p>
@@ -935,7 +933,7 @@
             </div>
           </article>
 
-          <article class="cell frag-top" data-reveal>
+          <article class="cell" data-reveal>
             <div class="cell-text">
               <h3>只能傳文字和貼圖</h3>
               <p>聊天不開放傳照片，只能傳文字和 Foci 內建的 90 張貼圖，不會突然收到你不想看的圖片。</p>
