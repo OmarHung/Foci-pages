@@ -608,7 +608,7 @@
               <button class="chip" type="button" aria-pressed="false" data-c="瑜伽冥想"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>瑜伽冥想</button>
               <button class="chip" type="button" aria-pressed="false" data-c="創作者"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>創作者</button>
             </div>
-            <p class="picker-result" id="pick-result">和你同圈 2 位：<b>思妤、子睿</b></p>
+            <p class="picker-result" id="pick-result">和你同圈 7 位：<b>芷晴、冠宇、思妤、偉翔、語婷、以萱</b> 等</p>
             <p class="picker-note" id="pick-note" aria-live="polite"></p>
           </div>
         </div>
@@ -1100,7 +1100,7 @@
         { id: 'guanyu', name: '冠宇', age: 23, km: '3.5', job: '平面設計師', bio: '剛畢業的設計師，週末泡唱片行。耳機裡永遠有一張還沒聽過的專輯。', circles: ['創作者', '獨立音樂', '電影同好', '精品咖啡'] },
         { id: 'siyu', name: '思妤', age: 29, km: '2.3', job: '品牌企劃', bio: '咖啡廳是我的第二個家。會手沖也會拉花，最近在練習烘豆。', circles: ['精品咖啡', '閱讀書友', '攝影同好', '旅行揪伴', '美食探店'] },
         { id: 'mia', name: 'Mia', age: 30, km: '1.8', job: '健身教練', bio: '健身教練，相信流汗是最好的保養。喜歡重訓、拳擊和戶外慢跑。', circles: ['重訓健身', '瑜伽冥想', '美食探店', '旅行揪伴'] },
-        { id: 'zirui', name: '子睿', age: 35, km: '6.5', job: '攝影師', bio: '街拍攝影師，用底片記錄城市的光。喜歡老城區、霓虹燈和雨後的反光。', circles: ['攝影同好', '電影同好', '獨立音樂', '精品咖啡', '旅行揪伴', '創作者'] },
+        { id: 'zirui', name: '子睿', age: 35, km: '6.5', job: '攝影師', bio: '街拍攝影師，用底片記錄城市的光。喜歡老城區、霓虹燈和雨後的反光。', circles: ['攝影同好'] },
         { id: 'caijie', name: '采潔', age: 28, km: '3.2', job: '美食編輯', bio: '美食編輯，吃遍台北是我的工作也是興趣。最懂巷弄裡的隱藏名單。', circles: ['美食探店', '品酒微醺', '旅行揪伴'] },
         { id: 'ryan', name: 'Ryan', age: 33, km: '5.4', job: '遠端工作者', bio: '半個遊牧民族，去過 30 幾個國家。最愛海島和潛水，也愛爬山。', circles: ['旅行揪伴', '登山健行', '攝影同好', '美食探店'] },
         { id: 'weixiang', name: '偉翔', age: 32, km: '2.7', job: '軟體工程師', bio: '假日一定往山上跑的工程師。爬過 27 座百岳，背包裡永遠塞著一台相機。', circles: ['登山健行', '攝影同好', '旅行揪伴', '精品咖啡'] },
@@ -1388,7 +1388,7 @@
         { id: 'caijie', shared: '美食探店', other: '品酒微醺' },
         { id: 'siyu', shared: '精品咖啡', other: '閱讀書友' },
         { id: 'mia', shared: '重訓健身', other: '瑜伽冥想' },
-        { id: 'zirui', shared: '攝影同好', other: '獨立音樂' },
+        { id: 'zirui', shared: '攝影同好' },
         { id: 'ryan', shared: '旅行揪伴', other: '登山健行' }
       ];
       var exDeck = document.getElementById('ex-deck');
@@ -1422,7 +1422,7 @@
         info.appendChild(el('p', 'pcard-bio', d.p.bio));
         var tags = el('p', 'pcard-tags');
         tags.appendChild(el('span', 'shared', '共同圈 ・ ' + d.e.shared));
-        tags.appendChild(el('span', null, d.e.other));
+        if (d.e.other) tags.appendChild(el('span', null, d.e.other));
         info.appendChild(tags);
         card.appendChild(img);
         card.appendChild(info);
