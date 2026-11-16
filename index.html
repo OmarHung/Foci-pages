@@ -1090,6 +1090,7 @@
 
       /* ── 首屏：選圈 → 找出同圈的人 ── */
       var MIN_SLOTS = 3; // 結尾那段至少顯示幾個位置（不足的用「再挑一個」補）
+      var NAMES_SHOWN = 6; // 「和你同圈 N 位」最多列出幾個名字
       var SWIPE_MIN = 90; // 拖超過這個距離（px）才算滑走
       var STAMP_TEXT = { like: '喜歡', nope: '略過', super: '超級喜歡' };
       var PEOPLE = [
@@ -1098,7 +1099,13 @@
         { id: 'zirui', name: '子睿', age: 35, km: '6.5', job: '攝影師', bio: '街拍攝影師，用底片記錄城市的光。喜歡老城區、霓虹燈和雨後的反光。', circles: ['攝影同好', '電影同好', '獨立音樂', '精品咖啡', '旅行揪伴', '創作者'] },
         { id: 'caijie', name: '采潔', age: 28, km: '3.2', job: '美食編輯', bio: '美食編輯，吃遍台北是我的工作也是興趣。最懂巷弄裡的隱藏名單。', circles: ['美食探店', '品酒微醺', '旅行揪伴'] },
         { id: 'ryan', name: 'Ryan', age: 33, km: '5.4', job: '遠端工作者', bio: '半個遊牧民族，去過 30 幾個國家。最愛海島和潛水，也愛爬山。', circles: ['旅行揪伴', '登山健行', '攝影同好', '美食探店'] },
-        { id: 'weixiang', name: '偉翔', age: 32, km: '2.7', job: '軟體工程師', bio: '假日一定往山上跑的工程師。爬過 27 座百岳，背包裡永遠塞著一台相機。', circles: ['登山健行', '攝影同好', '旅行揪伴', '精品咖啡'] }
+        { id: 'weixiang', name: '偉翔', age: 32, km: '2.7', job: '軟體工程師', bio: '假日一定往山上跑的工程師。爬過 27 座百岳，背包裡永遠塞著一台相機。', circles: ['登山健行', '攝影同好', '旅行揪伴', '精品咖啡'] },
+        { id: 'yuting', name: '語婷', age: 27, km: '4.6', job: '出版編輯', bio: '週末的固定行程是逛獨立書店。想找一個可以安靜待著，也能聊到天亮的人。', circles: ['閱讀書友', '精品咖啡', '電影同好', '創作者'] },
+        { id: 'chenghan', name: '承翰', age: 31, km: '3.8', job: '音樂製作人', bio: '白天做配樂，晚上泡在 Live House。吉他彈得普通，但很會挑歌。', circles: ['獨立音樂', '創作者', '品酒微醺', '電影同好'] },
+        { id: 'yixuan', name: '以萱', age: 30, km: '2.9', job: '瑜伽老師', bio: '早起練瑜伽，假日爬山。喜歡慢慢來的步調，也喜歡認真聊天的人。', circles: ['瑜伽冥想', '登山健行', '閱讀書友', '精品咖啡'] },
+        { id: 'junjie', name: '俊傑', age: 34, km: '5.1', job: '餐酒館老闆', bio: '開了一間小酒館，最懂搭餐的酒。休息日愛看老電影，也愛到處找好吃的。', circles: ['品酒微醺', '美食探店', '電影同好', '旅行揪伴'] },
+        { id: 'xinyi', name: '欣怡', age: 28, km: '1.9', job: '插畫家', bio: '自由接案的插畫家，工作室堆滿畫布和顏料。喜歡用畫記錄身邊的人。', circles: ['創作者', '攝影同好', '獨立音樂', '精品咖啡'] },
+        { id: 'boyu', name: '柏宇', age: 28, km: '4.4', job: '物理治療師', bio: '一週練四天，假日愛去爬山。想找能一起訓練、也能一起吃大餐的夥伴。', circles: ['重訓健身', '登山健行', '美食探店', '旅行揪伴'] }
       ];
       var picked = ['精品咖啡'];
       var matches = [];
@@ -1188,7 +1195,10 @@
         resultEl.textContent = '';
         if (!picked.length) { resultEl.textContent = '先選一個圈。'; return; }
         resultEl.appendChild(document.createTextNode('和你同圈 ' + matches.length + ' 位：'));
-        resultEl.appendChild(el('b', null, matches.map(function (p) { return p.name; }).join('、')));
+        // 人多時只列前 NAMES_SHOWN 位，避免這行拉得太長
+        var names = matches.slice(0, NAMES_SHOWN).map(function (p) { return p.name; }).join('、');
+        resultEl.appendChild(el('b', null, names));
+        if (matches.length > NAMES_SHOWN) resultEl.appendChild(document.createTextNode(' 等'));
       }
 
       // 結尾那段的圈：帶入首屏挑的圈（全部），不足 MIN_SLOTS 個的空位可以點回去挑
