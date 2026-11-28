@@ -1,1 +1,1 @@
-{ "v": 1, "maintenance": { "active": false, "message": "" } }
+{ "v": 1, "maintenance": { "active": true, "message": "（測試）前景切頁也會擋的測試。", "endsAt": "2026-11-28T16:00:00+08:00" } }
