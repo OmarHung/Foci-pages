@@ -219,7 +219,7 @@
     .pcard-empty { display: grid; place-items: center; text-align: center; padding: 32px; background: #fff; color: var(--ink); }
     .pcard-empty p { font-family: var(--serif); font-weight: 700; font-size: 22px; line-height: 1.4; }
 
-    /* 探索頁的略過／喜歡按鈕 */
+    /* 探索頁的跳過／喜歡按鈕 */
     .deck-actions { display: flex; align-items: center; gap: 22px; }
     .act { display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; transition: transform .15s var(--ease), background-color .2s var(--ease); }
     .act svg { width: 26px; height: 26px; }
@@ -339,20 +339,36 @@
     .s-actions .sa.star .ico { fill: currentColor; stroke: none; }
     .s-actions .sa.star b { position: absolute; top: -6px; right: -8px; padding: 0 6px; height: 18px; border-radius: 9px; display: grid; place-items: center; background: var(--gold); color: #fff; font-size: 13px; font-weight: 600; line-height: 1; }
 
-    /* 滑卡：左滑略過、右滑喜歡、上滑超級喜歡（首屏與探索共用） */
+    /* 滑卡：左滑跳過、右滑喜歡；超級喜歡只能按星星鈕（和 App 一樣，首屏與探索共用） */
     .swipe { touch-action: none; user-select: none; -webkit-user-select: none; border-radius: 24px; }
     .swipe:focus-visible { outline-offset: 8px; }
     .swipe img { -webkit-user-drag: none; }
     .swipe .is-top, .deck .pcard.is-on { cursor: grab; }
-    .swipe .dragging { cursor: grabbing; transition: none !important; }
+    .swipe .dragging { cursor: grabbing; }
+    .swipe .dragging, .swipe .is-anim { transition: none !important; }
+    /* 整張卡疊一層方向色，拖到門檻時最濃 */
+    .tint { position: absolute; inset: 0; z-index: 3; border-radius: inherit; opacity: 0; pointer-events: none; }
+    .tint.like { background: var(--accent); }
+    .tint.nope { background: var(--ink); }
+    .tint.super { background: var(--gold); }
+    /* 決策印章：實心底色＋白框白字，壓在任何照片上都看得清楚；淡入與縮放由拖曳距離決定 */
     .stamp {
-      position: absolute; z-index: 3; top: 22px; padding: 2px 12px; border: 3px solid currentColor; border-radius: 10px;
-      font-family: var(--sans); font-weight: 800; font-size: 22px; line-height: 1.3; letter-spacing: .02em;
+      position: absolute; z-index: 4; top: 76px; display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 18px 8px 14px; border: 3px solid #fff; border-radius: 16px; color: #fff;
+      font-family: var(--serif); font-weight: 700; font-size: 30px; line-height: 1; letter-spacing: .04em; white-space: nowrap;
+      box-shadow: 0 4px 10px rgba(0,0,0,.3); /* taste-skill-ignore：和 App 印章同一個陰影 */
       opacity: 0; visibility: hidden; pointer-events: none;
     }
-    .stamp.like { left: 18px; color: #5FD3A0; transform: rotate(-14deg); }
-    .stamp.nope { right: 18px; color: #fff; transform: rotate(14deg); }
-    .stamp.super { left: 50%; top: 38%; color: #F2C66D; transform: translateX(-50%) rotate(-6deg); }
+    .stamp b { font-weight: 700; }
+    .stamp svg { width: 26px; height: 26px; flex: none; }
+    .stamp.like { left: 22px; background: var(--accent); }
+    .stamp.nope { right: 22px; background: var(--ink); }
+    .stamp.super { left: 50%; top: 50%; background: var(--gold); }
+    .s-card .stamp { top: 64px; gap: 6px; padding: 7px 15px 7px 12px; font-size: 25px; }
+    .s-card .stamp svg { width: 22px; height: 22px; }
+    .s-card .stamp.like { left: 18px; }
+    .s-card .stamp.nope { right: 18px; }
+    .s-card .stamp.super { top: 50%; }
 
     /* 完整檔案卡 */
     .s-profile { width: min(330px, 100%); background: #fff; border-radius: 26px; overflow: hidden; }
@@ -685,7 +701,7 @@
         </div>
 
         <div class="hero-stage" data-reveal>
-          <div class="deck swipe" id="deck" data-ui tabindex="0" aria-label="同圈的人：往左滑略過、往右滑喜歡、往上滑超級喜歡，也可以用方向鍵">
+          <div class="deck swipe" id="deck" data-ui tabindex="0" aria-label="同圈的人：往左滑跳過、往右滑喜歡，也可以用左右方向鍵">
             <article class="pcard is-on" data-id="zhiqing">
               <img src="assets/people/zhiqing.jpg" width="720" height="987" alt="芷晴的檔案照片（示意）" />
               <div class="pcard-info">
@@ -697,7 +713,7 @@
             </article>
           </div>
           <div class="deck-actions" data-ui>
-            <button class="act act-pass" type="button" id="act-pass" aria-label="略過，看下一位"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+            <button class="act act-pass" type="button" id="act-pass" aria-label="跳過，看下一位"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
             <button class="act act-like" type="button" id="act-like" aria-label="喜歡，看下一位"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3s-7.6-4.6-7.6-10.4A4.4 4.4 0 0 1 12 7.2a4.4 4.4 0 0 1 7.6 2.7c0 5.8-7.6 10.4-7.6 10.4z" fill="currentColor"/></svg></button>
           </div>
           <p class="sr-only" id="deck-status" aria-live="polite"></p>
@@ -891,9 +907,9 @@
             </div>
           </div>
 
-          <!-- 探索：可以左滑、右滑、上滑的卡片堆 -->
+          <!-- 探索：左滑跳過、右滑喜歡，超級喜歡按星星鈕 -->
           <div class="shot" id="shot-explore" role="tabpanel" aria-labelledby="tab-explore" data-k="explore" data-ui>
-            <div class="s-deck swipe" id="ex-deck" tabindex="0" aria-label="探索卡片：往左滑略過、往右滑喜歡、往上滑超級喜歡，也可以用方向鍵">
+            <div class="s-deck swipe" id="ex-deck" tabindex="0" aria-label="探索卡片：往左滑跳過、往右滑喜歡，超級喜歡按星星鈕；也可以用方向鍵，上鍵是超級喜歡">
               <article class="s-card ui-card is-top">
                 <img src="assets/people/caijie.jpg" width="720" height="987" loading="lazy" alt="采潔的檔案照片（示意）" />
                 <div class="pcard-info">
@@ -906,7 +922,7 @@
             </div>
             <div class="s-actions">
               <button class="sa sm" type="button" id="ex-undo" aria-label="回到上一位" disabled><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 8L5 12l4 4M5 12h9a5 5 0 0 1 0 10h-2"/></svg></button>
-              <button class="sa" type="button" id="ex-pass" aria-label="略過"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg></button>
+              <button class="sa" type="button" id="ex-pass" aria-label="跳過"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg></button>
               <button class="sa star" type="button" id="ex-super" aria-label="超級喜歡，剩 15 次"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg><b id="ex-super-n">15</b></button>
               <button class="sa like" type="button" id="ex-like" aria-label="喜歡"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3s-7.6-4.6-7.6-10.4A4.4 4.4 0 0 1 12 7.2a4.4 4.4 0 0 1 7.6 2.7c0 5.8-7.6 10.4-7.6 10.4z"/></svg></button>
               <span class="sa sm" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg></span>
@@ -1224,8 +1240,23 @@
       /* ── 首屏：選圈 → 找出同圈的人 ── */
       var MIN_SLOTS = 3; // 結尾那段至少顯示幾個位置（不足的用「再挑一個」補）
       var NAMES_SHOWN = 6; // 「和你同圈 N 位」最多列出幾個名字
-      var SWIPE_MIN = 90; // 拖超過這個距離（px）才算滑走
-      var STAMP_TEXT = { like: '喜歡', nope: '略過', super: '超級喜歡' };
+      // 滑卡的手感照 App（apps/mobile/src/components/swipe-deck.tsx）：門檻、印章浮現、色調、按鈕兩段式飛出
+      var SWIPE_X = 115; // 左右拖超過這個距離（px）放手才算滑走
+      var SWIPE_UP = 120; // 星星鈕飛出時，超級喜歡印章以這個高度為「到門檻」
+      var STAMP_START = 0.3; // 拖到門檻 30% 印章開始浮現
+      var STAMP_MIN_SCALE = 0.7;
+      var STAMP_OVER_SCALE = 1.1; // 拖到門檻 1.5 倍時的縮放（表示放手就成立）
+      var TINT_MAX = 0.22; // 方向色在門檻處的濃度
+      var THROW_MS = 280; // 手指拋出
+      var NUDGE = 1.3, NUDGE_MS = 220, HOLD_MS = 80, BUTTON_OUT_MS = 300; // 按鈕：先推到門檻外、停一下、再飛出
+      var SPRING = { damping: 20, stiffness: 200, mass: 0.6 }; // 沒成立時回彈
+      var STAMP_TEXT = { like: '喜歡', nope: '跳過', super: '超級喜歡' };
+      var STAMP_ROT = { like: 'rotate(-12deg)', nope: 'rotate(12deg)', super: 'translate(-50%, -50%) rotate(-4deg)' };
+      var STAMP_ICON = {
+        like: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3s-7.6-4.6-7.6-10.4A4.4 4.4 0 0 1 12 7.2a4.4 4.4 0 0 1 7.6 2.7c0 5.8-7.6 10.4-7.6 10.4z" fill="currentColor"/></svg>',
+        nope: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg>',
+        super: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z" fill="currentColor"/></svg>'
+      };
       var PEOPLE = [
         { id: 'zhiqing', name: '芷晴', age: 21, km: '2.2', job: '大學生', bio: '大三，課表排好才有力氣到處吃。想找一起跑咖啡廳、看首輪電影的人。', circles: ['美食探店', '精品咖啡', '電影同好', '旅行揪伴'] },
         { id: 'yuchen', name: '昱彤', age: 24, km: '4.2', job: '研究生', bio: '研究所在讀，實驗室和健身房兩邊跑。想找放假能一起爬山、練腿的人。', circles: ['重訓健身', '登山健行', '旅行揪伴', '美食探店'] },
@@ -1363,82 +1394,167 @@
         restart();
       }
 
-      /* ── 滑卡：拖曳卡片，往左略過、往右喜歡、往上超級喜歡（首屏與探索共用） ── */
+      /* ── 滑卡：拖曳卡片，往左跳過、往右喜歡；超級喜歡只能按星星鈕（首屏與探索共用） ── */
       function addStamps(card) {
         Object.keys(STAMP_TEXT).forEach(function (k) {
-          var s = el('span', 'stamp ' + k, STAMP_TEXT[k]);
+          var t = el('span', 'tint ' + k);
+          t.setAttribute('aria-hidden', 'true');
+          card.appendChild(t);
+        });
+        Object.keys(STAMP_TEXT).forEach(function (k) {
+          var s = el('span', 'stamp ' + k);
           s.setAttribute('aria-hidden', 'true');
+          s.innerHTML = STAMP_ICON[k];
+          s.appendChild(el('b', null, STAMP_TEXT[k]));
           card.appendChild(s);
         });
       }
 
-      // 依拖曳方向與距離，淡入對應的印章
-      function setStamps(card, dx, dy) {
-        var up = dy < 0 && Math.abs(dy) > Math.abs(dx);
-        var op = {
-          like: !up && dx > 0 ? Math.min(dx / SWIPE_MIN, 1) : 0,
-          nope: !up && dx < 0 ? Math.min(-dx / SWIPE_MIN, 1) : 0,
-          super: up ? Math.min(-dy / SWIPE_MIN, 1) : 0
-        };
-        Object.keys(op).forEach(function (k) {
-          var s = card.querySelector('.stamp.' + k);
-          if (!s) return;
-          s.style.opacity = op[k];
-          s.style.visibility = op[k] > 0 ? 'visible' : 'hidden';
+      function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+      function lerp(p, p0, p1, v0, v1) { return v0 + (v1 - v0) * clamp01((p - p0) / (p1 - p0)); }
+      function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+      function easeIn(t) { return t * t * t; }
+
+      // progress：往該方向拖了門檻的幾倍（0＝沒拖、1＝剛好到門檻）
+      function paintStamp(card, k, progress) {
+        var s = card.querySelector('.stamp.' + k);
+        var t = card.querySelector('.tint.' + k);
+        var op = lerp(progress, STAMP_START, 1, 0, 1);
+        var sc = progress <= 1 ? lerp(progress, STAMP_START, 1, STAMP_MIN_SCALE, 1) : lerp(progress, 1, 1.5, 1, STAMP_OVER_SCALE);
+        if (s) {
+          s.style.opacity = op;
+          s.style.visibility = op > 0 ? 'visible' : 'hidden';
+          s.style.transform = STAMP_ROT[k] + ' scale(' + sc + ')';
+        }
+        if (t) t.style.opacity = clamp01(progress) * TINT_MAX;
+      }
+
+      // 把卡片放到 (x, y)：旋轉、印章、方向色都跟著位置算，和 App 一樣
+      function place(card, x, y, superP) {
+        var rot = Math.max(-18, Math.min(18, x * 0.03));
+        card._x = x;
+        card._y = y;
+        card.style.transform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rot + 'deg)';
+        paintStamp(card, 'like', x / SWIPE_X);
+        paintStamp(card, 'nope', -x / SWIPE_X);
+        paintStamp(card, 'super', superP || 0);
+      }
+
+      function stopAnim(card) {
+        if (card._raf) cancelAnimationFrame(card._raf);
+        card._raf = 0;
+      }
+
+      // 卡片回到原位、清掉動畫狀態（飛走後拿來重用前呼叫）
+      function resetCard(card) {
+        stopAnim(card);
+        place(card, 0, 0);
+        card._x = card._y = 0;
+        card.classList.remove('is-anim');
+        card.style.transform = '';
+        card.style.opacity = '';
+      }
+
+      // 從目前位置補間到 (x, y)；superP 依 y 算超級喜歡印章，fade 時一路淡出
+      function animateTo(card, x, y, ms, ease, opts, done) {
+        var x0 = card._x || 0, y0 = card._y || 0, t0 = null;
+        stopAnim(card);
+        card.classList.add('is-anim');
+        function frame(now) {
+          if (t0 === null) t0 = now;
+          var t = Math.min((now - t0) / ms, 1);
+          var e = ease(t);
+          var ny = y0 + (y - y0) * e;
+          place(card, x0 + (x - x0) * e, ny, opts.superP ? opts.superP(ny) : 0);
+          if (opts.fade) card.style.opacity = String(1 - t * t);
+          if (t < 1) card._raf = requestAnimationFrame(frame);
+          else { card._raf = 0; if (done) done(); }
+        }
+        card._raf = requestAnimationFrame(frame);
+      }
+
+      // 沒滑成立：用彈簧回到原位（同 App 的 withSpring 參數）
+      function snapBack(card) {
+        if (reduce) { resetCard(card); return; }
+        var x = card._x || 0, y = card._y || 0, vx = 0, vy = 0, last = null;
+        stopAnim(card);
+        card.classList.add('is-anim');
+        function frame(now) {
+          var dt = last === null ? 1 / 60 : Math.min((now - last) / 1000, 1 / 30);
+          last = now;
+          vx += (-SPRING.stiffness * x - SPRING.damping * vx) / SPRING.mass * dt;
+          vy += (-SPRING.stiffness * y - SPRING.damping * vy) / SPRING.mass * dt;
+          x += vx * dt;
+          y += vy * dt;
+          if (Math.abs(x) < 0.5 && Math.abs(y) < 0.5 && Math.abs(vx) < 8 && Math.abs(vy) < 8) { resetCard(card); return; }
+          place(card, x, y);
+          card._raf = requestAnimationFrame(frame);
+        }
+        card._raf = requestAnimationFrame(frame);
+      }
+
+      // 滑走。thrown 有值＝手指拋出（沿手勢軌跡直接飛走）；沒有＝按鈕或方向鍵（先推到門檻外讓印章浮現、停一下再飛）
+      function fly(card, dir, done, thrown) {
+        card.dataset.flying = '1';
+        var finish = function () { done(dir, card); };
+        if (reduce) { finish(); return; }
+        var outX = card.offsetWidth * 1.6 * (dir === 'left' ? -1 : 1);
+        var outY = -card.offsetHeight * 1.4;
+        if (thrown) {
+          animateTo(card, outX, (card._y || 0) + thrown.vy * 0.12, THROW_MS, easeOut, { fade: true }, finish);
+          return;
+        }
+        var up = dir === 'up';
+        var superP = up ? function (y) { return -y / SWIPE_UP; } : null;
+        var nudgeX = up ? (card._x || 0) : SWIPE_X * NUDGE * (dir === 'left' ? -1 : 1);
+        var nudgeY = up ? -SWIPE_UP * NUDGE : (card._y || 0);
+        animateTo(card, nudgeX, nudgeY, NUDGE_MS, easeOut, { superP: superP }, function () {
+          card._raf = requestAnimationFrame(function () {
+            setTimeout(function () {
+              animateTo(card, up ? nudgeX : outX, up ? outY : nudgeY, BUTTON_OUT_MS, easeIn, { superP: superP, fade: true }, finish);
+            }, HOLD_MS);
+          });
         });
       }
 
-      function fly(card, dir, done) {
-        card.dataset.flying = '1';
-        var to = dir === 'right' ? 'translate(140%, 6%) rotate(22deg)'
-          : dir === 'left' ? 'translate(-140%, 6%) rotate(-22deg)'
-          : 'translate(0, -130%)';
-        setStamps(card, dir === 'right' ? SWIPE_MIN : dir === 'left' ? -SWIPE_MIN : 0, dir === 'up' ? -SWIPE_MIN : 0);
-        card.style.transition = reduce ? 'none' : 'transform .38s cubic-bezier(.3,.6,.4,1), opacity .38s ease';
-        card.style.transform = to;
-        card.style.opacity = '0';
-        setTimeout(function () { done(dir, card); }, reduce ? 0 : 360);
-      }
-
-      function snapBack(card) {
-        card.style.transition = reduce ? 'none' : 'transform .3s cubic-bezier(.22,.7,.3,1)';
-        card.style.transform = '';
-        setStamps(card, 0, 0);
-        setTimeout(function () { card.style.transition = ''; }, 320);
-      }
-
-      // 綁定拖曳與方向鍵；getTop 回傳目前最上面那張卡
-      function makeSwipe(area, getTop, onSwipe, onStart, onEnd) {
+      // 綁定拖曳與方向鍵；getTop 回傳目前最上面那張卡。opts.up：上鍵＝超級喜歡（只有探索那堆有星星鈕）
+      function makeSwipe(area, getTop, onSwipe, onStart, onEnd, opts) {
         var drag = null;
         area.addEventListener('pointerdown', function (e) {
           var card = getTop();
           if (!card || !card.contains(e.target) || e.button > 0) return;
-          drag = { card: card, id: e.pointerId, x: e.clientX, y: e.clientY, dx: 0, dy: 0 };
+          stopAnim(card);
+          // 回彈途中又抓住：從目前位置接著拖
+          drag = { card: card, id: e.pointerId, x: e.clientX - (card._x || 0), y: e.clientY - (card._y || 0), dx: card._x || 0, dy: card._y || 0, vy: 0, t: e.timeStamp };
           try { card.setPointerCapture(e.pointerId); } catch (err) { /* 少數瀏覽器拿不到 pointer 時，照樣用冒泡的事件拖曳 */ }
+          card.classList.remove('is-anim');
           card.classList.add('dragging');
           if (onStart) onStart();
         });
         area.addEventListener('pointermove', function (e) {
           if (!drag || e.pointerId !== drag.id) return;
+          var dy = e.clientY - drag.y;
+          var dt = (e.timeStamp - drag.t) / 1000;
+          if (dt > 0) drag.vy = drag.vy * 0.6 + ((dy - drag.dy) / dt) * 0.4;
+          drag.t = e.timeStamp;
           drag.dx = e.clientX - drag.x;
-          drag.dy = e.clientY - drag.y;
-          drag.card.style.transform = 'translate(' + drag.dx + 'px,' + drag.dy + 'px) rotate(' + (drag.dx * 0.05) + 'deg)';
-          setStamps(drag.card, drag.dx, drag.dy);
+          drag.dy = dy;
+          place(drag.card, drag.dx, drag.dy);
         });
         function end(e) {
           if (!drag || e.pointerId !== drag.id) return;
           var d = drag;
           drag = null;
           d.card.classList.remove('dragging');
-          var up = d.dy < -SWIPE_MIN && Math.abs(d.dy) > Math.abs(d.dx);
-          var dir = up ? 'up' : d.dx > SWIPE_MIN ? 'right' : d.dx < -SWIPE_MIN ? 'left' : null;
-          if (dir) onSwipe(dir, d.card); else snapBack(d.card);
+          // 手勢只有左右滑會成立（往上拖不會送出超級喜歡）
+          var dir = d.dx > SWIPE_X ? 'right' : d.dx < -SWIPE_X ? 'left' : null;
+          if (dir) onSwipe(dir, d.card, { vy: d.vy }); else snapBack(d.card);
           if (onEnd) onEnd(e);
         }
         area.addEventListener('pointerup', end);
         area.addEventListener('pointercancel', end);
         area.addEventListener('keydown', function (e) {
-          var dir = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up' }[e.key];
+          var dir = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: opts && opts.up ? 'up' : null }[e.key];
           var card = dir && getTop();
           if (!card) return;
           e.preventDefault();
@@ -1456,7 +1572,7 @@
       function heroTop() {
         return deck.querySelector('.pcard.is-on:not(.pcard-empty):not([data-flying])');
       }
-      function heroSwipe(dir, card) {
+      function heroSwipe(dir, card, thrown) {
         if (matches.length < 2) {
           snapBack(card);
           noteEl.textContent = '這幾個圈裡只有 1 位，多選一個圈看看。';
@@ -1466,12 +1582,10 @@
         fly(card, dir, function () {
           show((current + 1) % matches.length);
           card.style.transition = '';
-          card.style.transform = '';
-          card.style.opacity = '';
-          setStamps(card, 0, 0);
+          resetCard(card);
           delete card.dataset.flying;
           restart();
-        });
+        }, thrown);
       }
       makeSwipe(deck, heroTop, heroSwipe, function () { paused = true; }, function (e) { if (e.pointerType !== 'mouse') paused = false; });
 
@@ -1571,7 +1685,7 @@
       function exTop() {
         return exDeck.querySelector('.s-card.is-top:not([data-flying])');
       }
-      function exSwipe(dir, card) {
+      function exSwipe(dir, card, thrown) {
         if (dir === 'up' && superLeft === 0) {
           snapBack(card);
           exStatus.textContent = '這個月的超級喜歡用完了';
@@ -1597,10 +1711,10 @@
           }
           exDeck.insertBefore(exCard(exIdx + 1, true), exDeck.firstChild);
           exUndo.disabled = false;
-          exStatus.textContent = (dir === 'right' ? '喜歡了' : dir === 'left' ? '略過了' : '超級喜歡了') + name;
-        });
+          exStatus.textContent = (dir === 'right' ? '喜歡了' : dir === 'left' ? '跳過了' : '超級喜歡了') + name;
+        }, thrown);
       }
-      makeSwipe(exDeck, exTop, exSwipe);
+      makeSwipe(exDeck, exTop, exSwipe, null, null, { up: true });
       document.getElementById('ex-pass').addEventListener('click', function () { var c = exTop(); if (c) exSwipe('left', c); });
       exLike.addEventListener('click', function () { var c = exTop(); if (c) exSwipe('right', c); });
       exSuperBtn.addEventListener('click', function () { var c = exTop(); if (c) exSwipe('up', c); });
